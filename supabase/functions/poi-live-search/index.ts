@@ -30,6 +30,25 @@ function pickFilters(query: string): string[] {
   return ['["amenity"]["name"]', '["shop"]["name"]'];
 }
 
+// All category keywords + noise words we strip to isolate the location for geocoding.
+const NOISE_WORDS = new Set([
+  ...CATEGORY_TAGS.flatMap((c) => c.keywords.flatMap((k) => k.split(" "))),
+  "top", "best", "near", "me", "in", "at", "the", "a", "of", "and", "list", "stations",
+  "station", "places", "place", "around", "close", "to", "50", "100", "1000", "businesses",
+  "business", "companies", "company", "services", "service", "spots", "spot",
+]);
+
+function extractLocation(query: string): string {
+  const words = query
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w && !NOISE_WORDS.has(w) && isNaN(Number(w)));
+  const loc = words.join(" ").trim();
+  return loc || query;
+}
+
+
 interface POI {
   id: string;
   name: string;
