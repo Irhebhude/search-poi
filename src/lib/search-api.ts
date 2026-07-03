@@ -6,6 +6,54 @@ const SUMMARIZE_URL = `${BASE}/functions/v1/summarize-url`;
 const IMAGE_SEARCH_URL = `${BASE}/functions/v1/image-search`;
 const VIDEO_SEARCH_URL = `${BASE}/functions/v1/video-search`;
 const NEWS_SEARCH_URL = `${BASE}/functions/v1/news-search`;
+const POI_LIVE_URL = `${BASE}/functions/v1/poi-live-search`;
+
+export interface LivePOI {
+  id: string;
+  name: string;
+  category: string;
+  address: string;
+  phone: string | null;
+  website: string | null;
+  lat: number;
+  lon: number;
+  mapUrl: string;
+}
+
+export interface LivePOIResponse {
+  query: string;
+  count: number;
+  cached?: boolean;
+  results: LivePOI[];
+  message?: string;
+}
+
+export async function livePoiSearch(query: string, limit = 50): Promise<LivePOIResponse> {
+  const resp = await fetch(POI_LIVE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${KEY}`,
+    },
+    body: JSON.stringify({ query, limit }),
+  });
+
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => ({}));
+    return { query, count: 0, results: [], message: data.error || "Live search failed. Try again." };
+  }
+
+  return resp.json();
+}
+
+export function poiToCsv(rows: LivePOI[]): string {
+  const header = ["Name", "Category", "Address", "Phone", "Website", "Latitude", "Longitude", "Map"];
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const lines = rows.map((r) =>
+    [r.name, r.category, r.address, r.phone, r.website, r.lat, r.lon, r.mapUrl].map(esc).join(","),
+  );
+  return [header.join(","), ...lines].join("\n");
+}
 
 export type SearchMode = "default" | "deep_research" | "code" | "academic" | "business";
 
