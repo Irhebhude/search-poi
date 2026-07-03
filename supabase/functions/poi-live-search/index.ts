@@ -99,31 +99,37 @@ serve(async (req) => {
     }
 
     // ---- 2. Geocode the location part via Nominatim (keyless, free) ----
+    // Fetch several candidates and prefer real places (city/town/suburb/region)
+    // over unrelated businesses that happen to share the name.
     const geocode = async (q: string) => {
       const r = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=10&addressdetails=1`,
         { headers: { "User-Agent": "SEARCH-POI/1.0 (poi-live-search)" } },
       );
-      return r.json();
+      const list = await r.json();
+      if (!Array.isArray(list) || list.length === 0) return null;
+      const places = list.filter((x: any) => x.class === "place" || x.class === "boundary");
+      const pool = places.length ? places : list;
+      pool.sort((a: any, b: any) => (b.importance || 0) - (a.importance || 0));
+      return pool[0];
     };
 
     const locationPart = extractLocation(cleanQuery);
-    let geoData = await geocode(locationPart);
-    if (!Array.isArray(geoData) || geoData.length === 0) {
-      // fallback: try the full raw query
-      geoData = await geocode(cleanQuery);
-    }
+    let best = await geocode(locationPart);
+    if (!best) best = await geocode(cleanQuery);
 
-    if (!Array.isArray(geoData) || geoData.length === 0) {
+    if (!best) {
       return new Response(
         JSON.stringify({ query: cleanQuery, count: 0, results: [], message: "No live data found. Try different keywords." }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const lat = parseFloat(geoData[0].lat);
-    const lon = parseFloat(geoData[0].lon);
+    const geoData = [best];
+    const lat = parseFloat(best.lat);
+    const lon = parseFloat(best.lon);
     const radius = 6000; // metres
+
 
     // ---- 3. Query Overpass API for REAL POIs around the location ----
     const filters = pickFilters(cleanQuery);
