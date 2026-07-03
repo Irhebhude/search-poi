@@ -132,20 +132,36 @@ serve(async (req) => {
       .join("");
     const overpassQuery = `[out:json][timeout:25];(${clauses});out center ${maxResults};`;
 
-    const opResp = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `data=${encodeURIComponent(overpassQuery)}`,
-    });
+    const OVERPASS_MIRRORS = [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.kumi.systems/api/interpreter",
+      "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    ];
 
-    if (!opResp.ok) {
+    let opData: any = null;
+    for (const mirror of OVERPASS_MIRRORS) {
+      try {
+        const opResp = await fetch(mirror, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `data=${encodeURIComponent(overpassQuery)}`,
+        });
+        if (opResp.ok) {
+          opData = await opResp.json();
+          break;
+        }
+      } catch (_) {
+        // try next mirror
+      }
+    }
+
+    if (!opData) {
       return new Response(
         JSON.stringify({ query: cleanQuery, count: 0, results: [], message: "Live data source is busy. Try again shortly." }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const opData = await opResp.json();
     const elements: any[] = opData.elements || [];
 
     const results: POI[] = elements
