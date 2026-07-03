@@ -315,6 +315,33 @@ export type Database = {
           },
         ]
       }
+      poi_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          id: string
+          payload: Json
+          query: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          payload?: Json
+          query: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          payload?: Json
+          query?: string
+        }
+        Relationships: []
+      }
       poi_points_log: {
         Row: {
           created_at: string
