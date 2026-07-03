@@ -99,11 +99,20 @@ serve(async (req) => {
     }
 
     // ---- 2. Geocode the location part via Nominatim (keyless, free) ----
-    const geoResp = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cleanQuery)}&format=json&limit=1&addressdetails=1`,
-      { headers: { "User-Agent": "SEARCH-POI/1.0 (poi-live-search)" } },
-    );
-    const geoData = await geoResp.json();
+    const geocode = async (q: string) => {
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&addressdetails=1`,
+        { headers: { "User-Agent": "SEARCH-POI/1.0 (poi-live-search)" } },
+      );
+      return r.json();
+    };
+
+    const locationPart = extractLocation(cleanQuery);
+    let geoData = await geocode(locationPart);
+    if (!Array.isArray(geoData) || geoData.length === 0) {
+      // fallback: try the full raw query
+      geoData = await geocode(cleanQuery);
+    }
 
     if (!Array.isArray(geoData) || geoData.length === 0) {
       return new Response(
