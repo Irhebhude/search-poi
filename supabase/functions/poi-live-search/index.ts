@@ -110,9 +110,19 @@ serve(async (req) => {
       );
       const list = await r.json();
       if (!Array.isArray(list) || list.length === 0) return null;
-      const places = list.filter((x: any) => x.class === "place" || x.class === "boundary");
-      const pool = places.length ? places : list;
-      pool.sort((a: any, b: any) => (b.importance || 0) - (a.importance || 0));
+      // Rank: prefer specific settlement/place types over huge admin boundaries
+      // and over unrelated businesses that merely share the name.
+      const rank = (x: any): number => {
+        if (x.class === "place") {
+          if (["city", "town", "suburb", "neighbourhood", "village", "island", "quarter"].includes(x.type)) return 3;
+          return 2;
+        }
+        if (x.class === "boundary") return 1;
+        return 0;
+      };
+      const pool = [...list].sort(
+        (a: any, b: any) => rank(b) - rank(a) || (b.importance || 0) - (a.importance || 0),
+      );
       return pool[0];
     };
 
