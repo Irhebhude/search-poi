@@ -140,7 +140,7 @@ serve(async (req) => {
     const geoData = [best];
     const lat = parseFloat(best.lat);
     const lon = parseFloat(best.lon);
-    const radius = 6000; // metres
+    const radius = 8000; // metres
 
 
     // ---- 3. Query Overpass API for REAL POIs around the location ----
