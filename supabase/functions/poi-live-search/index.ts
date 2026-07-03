@@ -39,11 +39,13 @@ const NOISE_WORDS = new Set([
 ]);
 
 function extractLocation(query: string): string {
+  const isNoise = (w: string) =>
+    NOISE_WORDS.has(w) || (w.endsWith("s") && NOISE_WORDS.has(w.slice(0, -1)));
   const words = query
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((w) => w && !NOISE_WORDS.has(w) && isNaN(Number(w)));
+    .filter((w) => w && !isNoise(w) && isNaN(Number(w)));
   const loc = words.join(" ").trim();
   return loc || query;
 }
