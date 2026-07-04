@@ -4,6 +4,7 @@ import { Zap, Clock, Menu, X, Gift, LogOut, User, Shield, Star, Trophy, Code } f
 import SearchHistory from "@/components/SearchHistory";
 import LiteModeToggle from "@/components/LiteModeToggle";
 import POIPointsBadge from "@/components/POIPointsBadge";
+import LiveClock from "@/components/LiveClock";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ADMIN_EMAIL = "prosperozoya50@gmail.com";
