@@ -1,15 +1,8 @@
-// worker.js — consolidated Cloudflare Worker for SEARCH-POI ENGINE v1
+// worker.js — SEARCH-POI ENGINE v1 - 100% FREE OSM VERSION
 // Routes: /api/time, /api/gps, /api/search, /api/export
-// Bindings: env.CACHE (KV), env.MAPBOX_KEY, env.GOOGLE_API_KEY (secrets)
-//
-// Deploy:
-//   wrangler secret put GOOGLE_API_KEY
-//   wrangler secret put MAPBOX_KEY
-//   wrangler deploy
-//
-// NOTE: This file is the standalone Cloudflare artifact used AFTER exporting the
-// repo. It mirrors the per-route functions in /functions/api/*. Keeping both lets
-// the app run on Lovable today and deploy to Cloudflare Pages/Workers on export.
+// Bindings: env.CACHE (KV only)
+// Deploy: wrangler deploy
+// NOTE: NO API KEYS NEEDED. Uses OpenStreetMap Nominatim + Overpass
 
 export default {
   async fetch(request, env, ctx) {
@@ -21,7 +14,7 @@ export default {
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
-        headers: { ...cors, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type" },
+        headers: {...cors, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type" },
       });
     }
 
@@ -35,21 +28,22 @@ export default {
             epochMs: now.getTime(),
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           }),
-          { headers: { ...cors, "Cache-Control": "no-store" } },
+          { headers: {...cors, "Cache-Control": "no-store" } },
         );
       }
 
-      // --- Reverse geocode (Mapbox) with 24h KV cache ---
+      // --- Reverse geocode FREE - Nominatim OSM with 24h KV cache ---
       if (url.pathname === "/api/gps") {
         const { lat, lng } = await request.json();
         if (lat == null || lng == null) {
           return new Response(JSON.stringify({ error: "lat and lng required" }), { status: 400, headers: cors });
         }
-        const cacheKey = `gps_${lat}_${lng}`;
-        let data = env.CACHE ? await env.CACHE.get(cacheKey) : null;
+        const cacheKey = `nominatim_${lat}_${lng}`;
+        let data = env.CACHE? await env.CACHE.get(cacheKey) : null;
         if (!data) {
           const res = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${env.MAPBOX_KEY}`,
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+            { headers: { "User-Agent": "Search-POI-Engine-v1" } }
           );
           data = await res.text();
           if (env.CACHE) ctx.waitUntil(env.CACHE.put(cacheKey, data, { expirationTtl: 86400 }));
@@ -57,22 +51,34 @@ export default {
         return new Response(data, { headers: cors });
       }
 
-      // --- POI search (Google Places) with 24h KV cache ---
+      // --- POI search FREE - Overpass OSM with 24h KV cache ---
       if (url.pathname === "/api/search") {
         const { query, lat, lng } = await request.json();
         if (!query || String(query).trim().length < 2) {
           return new Response(JSON.stringify({ error: "Query too short" }), { status: 400, headers: cors });
         }
-        const cacheKey = `search_${query}_${lat}_${lng}`;
-        let data = env.CACHE ? await env.CACHE.get(cacheKey) : null;
+        const cacheKey = `osm_${query}_${lat}_${lng}`;
+        let data = env.CACHE? await env.CACHE.get(cacheKey) : null;
         if (!data) {
-          const loc = lat != null && lng != null ? `&location=${lat},${lng}&radius=50000` : "";
-          const googleRes = await fetch(
-            `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}${loc}&key=${env.GOOGLE_API_KEY}`,
-          );
-          const googleData = await googleRes.json();
-          const results = googleData.results || [];
-          data = JSON.stringify(results.length > 0 ? results : { error: "No data found" });
+          // Search for amenity that matches query near lat,lng within 50km
+          const overpassQuery = `
+            [out:json][timeout:25];
+            (
+              node["amenity"~"${query}",i](around:50000,${lat},${lng});
+              way["amenity"~"${query}",i](around:50000,${lat},${lng});
+              node["shop"~"${query}",i](around:50000,${lat},${lng});
+              way["shop"~"${query}",i](around:50000,${lat},${lng});
+            );
+            out center 100;
+          `;
+          const osmRes = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: overpassQuery,
+            headers: { "User-Agent": "Search-POI-Engine-v1" }
+          });
+          const osmData = await osmRes.json();
+          const results = osmData.elements || [];
+          data = JSON.stringify(results.length > 0? results : { error: "No data found" });
           if (env.CACHE) ctx.waitUntil(env.CACHE.put(cacheKey, data, { expirationTtl: 86400 }));
         }
         return new Response(data, { headers: cors });
@@ -81,12 +87,12 @@ export default {
       // --- JSON rows -> CSV download ---
       if (url.pathname === "/api/export") {
         const json = await request.json();
-        const rows = Array.isArray(json) ? json : json.rows || [];
-        const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-        const headers = rows.length ? Object.keys(rows[0]) : [];
+        const rows = Array.isArray(json)? json : json.rows || [];
+        const esc = (v) => `"${String(v?? "").replace(/"/g, '""')}"`;
+        const headers = rows.length? Object.keys(rows[0]) : [];
         const csv = [
           headers.join(","),
-          ...rows.map((r) => headers.map((h) => esc(r[h])).join(",")),
+         ...rows.map((r) => headers.map((h) => esc(r[h])).join(",")),
         ].join("\n");
         return new Response(csv, {
           headers: {
