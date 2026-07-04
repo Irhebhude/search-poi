@@ -4,6 +4,7 @@ import { Zap, Clock, Menu, X, Gift, LogOut, User, Shield, Star, Trophy, Code } f
 import SearchHistory from "@/components/SearchHistory";
 import LiteModeToggle from "@/components/LiteModeToggle";
 import POIPointsBadge from "@/components/POIPointsBadge";
+import LiveClock from "@/components/LiveClock";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ADMIN_EMAIL = "prosperozoya50@gmail.com";
@@ -33,6 +34,10 @@ const Header = () => {
             SEARCH<span className="text-primary">-POI</span>
           </span>
         </Link>
+        {/* Live date/time engine */}
+        <div className="hidden md:flex mx-4">
+          <LiveClock />
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-3 text-sm relative">
