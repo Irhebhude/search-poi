@@ -1,6 +1,6 @@
-# /api/time — server clock for drift correction (Cloudflare Pages Function)
-# Returns authoritative server time so clients can auto-correct if device clock drifts >5s.
-export async function onRequest(context) {
+// /api/time — server clock for drift correction (Cloudflare Pages Function)
+// Returns authoritative server time so clients can auto-correct if device clock drifts >5s.
+Returns async function onRequest(context) {
   const now = new Date();
   return new Response(
     JSON.stringify({
