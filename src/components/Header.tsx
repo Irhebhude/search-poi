@@ -34,6 +34,10 @@ const Header = () => {
             SEARCH<span className="text-primary">-POI</span>
           </span>
         </Link>
+        {/* Live date/time engine */}
+        <div className="hidden md:flex mx-4">
+          <LiveClock />
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-3 text-sm relative">
