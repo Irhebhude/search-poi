@@ -21,5 +21,11 @@ verify_jwt = false
 [functions.poi-api]
 verify_jwt = false
 
+[functions.poi-live]
+verify_jwt = false
+
+[functions.poi-live-search]
+verify_jwt = false
+
 [functions.ayrshare-post]
 verify_jwt = false

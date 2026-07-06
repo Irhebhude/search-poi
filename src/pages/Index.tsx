@@ -5,6 +5,10 @@ import { Brain, Zap, Globe, Shield, Cpu, Layers, MapPin, Crown, Building2, Trend
 import SearchBar from "@/components/SearchBar";
 import FeatureCard from "@/components/FeatureCard";
 import Header from "@/components/Header";
+import LiveTopBar from "@/components/LiveTopBar";
+import HomeQuickActions from "@/components/HomeQuickActions";
+import FloatingMenu from "@/components/FloatingMenu";
+import { usePoiLive } from "@/hooks/usePoiLive";
 import AdSense from "@/components/AdSense";
 import SEOHead from "@/components/SEOHead";
 import LiveActivityFeed from "@/components/LiveActivityFeed";
@@ -64,10 +68,12 @@ const FINTECH_JSON_LD = {
 const Index = () => {
   const navigate = useNavigate();
   const [showLocationSearch, setShowLocationSearch] = useState(false);
+  const live = usePoiLive();
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
+
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -85,6 +91,9 @@ const Index = () => {
         jsonLd={FINTECH_JSON_LD}
       />
       <Header />
+      <LiveTopBar live={live} />
+      <FloatingMenu onNearMe={() => setShowLocationSearch(true)} />
+
 
       {/* Hero background with lazy loading */}
       <div className="absolute inset-0 z-0">
@@ -102,7 +111,7 @@ const Index = () => {
       <div className="absolute inset-0 z-0 grid-bg opacity-30" />
 
       {/* Main content */}
-      <main className="relative z-10 pt-24 sm:pt-32 pb-16 sm:pb-20 px-3 sm:px-4">
+      <main className="relative z-10 pt-32 sm:pt-40 pb-16 sm:pb-20 px-3 sm:px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Hero */}
           <motion.div
@@ -117,8 +126,8 @@ const Index = () => {
               transition={{ delay: 0.15, duration: 0.4 }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-primary font-medium mb-4 sm:mb-6"
             >
-              <Zap className="w-3 h-3" />
-              Next-Gen AI Search & Fintech Intelligence
+              <Shield className="w-3 h-3" />
+              Independent · Owned by POI Foundation
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-2 sm:mb-3">
@@ -129,12 +138,15 @@ const Index = () => {
               <Zap className="w-3 h-3" />
               Powered by SEARCH-POI Engine v1
             </div>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
-              The world's first <span className="text-foreground font-medium">Intelligent Reasoning Search Engine</span>.
-              You don't search anymore — you ask, and it <span className="text-primary font-semibold">solves</span>.
+            <p className="text-xl sm:text-2xl md:text-3xl text-foreground font-semibold max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
+              Don't search. <span className="gradient-text">Ask.</span>
             </p>
 
+
             <SearchBar onSearch={handleSearch} />
+
+            <HomeQuickActions onNearMe={() => setShowLocationSearch(true)} />
+
 
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-3 sm:mt-4">
               <p className="text-xs text-muted-foreground">
@@ -211,6 +223,7 @@ const Index = () => {
             transition={{ delay: 0.8 }}
             className="text-center mt-16 sm:mt-20 text-xs text-muted-foreground px-2"
           >
+            <p id="lastUpdate" className="mb-2 text-primary/90 font-medium tabular-nums">{live.lastUpdate}</p>
             <p>Founded by <span className="text-foreground">Prosper Ozoya Irhebhude</span> • POI Foundation</p>
             <p className="mt-1">Powered by <span className="text-primary font-semibold">SEARCH-POI Engine v1</span> • Intelligent Reasoning • Privacy Focused</p>
             <p className="mt-2"><a href="/policies" className="text-primary hover:underline">Policies & Governance</a></p>
