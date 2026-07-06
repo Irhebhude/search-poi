@@ -111,7 +111,7 @@ const Index = () => {
       <div className="absolute inset-0 z-0 grid-bg opacity-30" />
 
       {/* Main content */}
-      <main className="relative z-10 pt-24 sm:pt-32 pb-16 sm:pb-20 px-3 sm:px-4">
+      <main className="relative z-10 pt-32 sm:pt-40 pb-16 sm:pb-20 px-3 sm:px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Hero */}
           <motion.div
