@@ -126,8 +126,8 @@ const Index = () => {
               transition={{ delay: 0.15, duration: 0.4 }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-primary font-medium mb-4 sm:mb-6"
             >
-              <Zap className="w-3 h-3" />
-              Next-Gen AI Search & Fintech Intelligence
+              <Shield className="w-3 h-3" />
+              Independent · Owned by POI Foundation
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-2 sm:mb-3">
@@ -138,10 +138,10 @@ const Index = () => {
               <Zap className="w-3 h-3" />
               Powered by SEARCH-POI Engine v1
             </div>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
-              The world's first <span className="text-foreground font-medium">Intelligent Reasoning Search Engine</span>.
-              You don't search anymore — you ask, and it <span className="text-primary font-semibold">solves</span>.
+            <p className="text-xl sm:text-2xl md:text-3xl text-foreground font-semibold max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
+              Don't search. <span className="gradient-text">Ask.</span>
             </p>
+
 
             <SearchBar onSearch={handleSearch} />
 
