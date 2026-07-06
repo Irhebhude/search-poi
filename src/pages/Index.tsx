@@ -91,6 +91,9 @@ const Index = () => {
         jsonLd={FINTECH_JSON_LD}
       />
       <Header />
+      <LiveTopBar live={live} />
+      <FloatingMenu onNearMe={() => setShowLocationSearch(true)} />
+
 
       {/* Hero background with lazy loading */}
       <div className="absolute inset-0 z-0">
