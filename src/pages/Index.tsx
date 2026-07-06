@@ -5,6 +5,10 @@ import { Brain, Zap, Globe, Shield, Cpu, Layers, MapPin, Crown, Building2, Trend
 import SearchBar from "@/components/SearchBar";
 import FeatureCard from "@/components/FeatureCard";
 import Header from "@/components/Header";
+import LiveTopBar from "@/components/LiveTopBar";
+import HomeQuickActions from "@/components/HomeQuickActions";
+import FloatingMenu from "@/components/FloatingMenu";
+import { usePoiLive } from "@/hooks/usePoiLive";
 import AdSense from "@/components/AdSense";
 import SEOHead from "@/components/SEOHead";
 import LiveActivityFeed from "@/components/LiveActivityFeed";
