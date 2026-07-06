@@ -223,6 +223,7 @@ const Index = () => {
             transition={{ delay: 0.8 }}
             className="text-center mt-16 sm:mt-20 text-xs text-muted-foreground px-2"
           >
+            <p id="lastUpdate" className="mb-2 text-primary/90 font-medium tabular-nums">{live.lastUpdate}</p>
             <p>Founded by <span className="text-foreground">Prosper Ozoya Irhebhude</span> • POI Foundation</p>
             <p className="mt-1">Powered by <span className="text-primary font-semibold">SEARCH-POI Engine v1</span> • Intelligent Reasoning • Privacy Focused</p>
             <p className="mt-2"><a href="/policies" className="text-primary hover:underline">Policies & Governance</a></p>
