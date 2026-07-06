@@ -68,10 +68,12 @@ const FINTECH_JSON_LD = {
 const Index = () => {
   const navigate = useNavigate();
   const [showLocationSearch, setShowLocationSearch] = useState(false);
+  const live = usePoiLive();
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
+
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
