@@ -145,6 +145,9 @@ const Index = () => {
 
             <SearchBar onSearch={handleSearch} />
 
+            <HomeQuickActions onNearMe={() => setShowLocationSearch(true)} />
+
+
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-3 sm:mt-4">
               <p className="text-xs text-muted-foreground">
                 SEARCH-POI Engine v1 • Multi-Step Reasoning • POI Foundation
