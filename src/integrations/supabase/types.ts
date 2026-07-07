@@ -203,6 +203,133 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_access_requests: {
+        Row: {
+          approved_at: string | null
+          buyer_email: string
+          buyer_name: string
+          created_at: string
+          document_id: string | null
+          download_token: string | null
+          id: string
+          message: string | null
+          status: string
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          buyer_email: string
+          buyer_name: string
+          created_at?: string
+          document_id?: string | null
+          download_token?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          buyer_email?: string
+          buyer_name?: string
+          created_at?: string
+          document_id?: string | null
+          download_token?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_access_requests_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "deal_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deal_documents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      deal_visitor_logs: {
+        Row: {
+          buyer_email: string | null
+          created_at: string
+          document_id: string | null
+          event_type: string
+          id: string
+          user_agent: string | null
+        }
+        Insert: {
+          buyer_email?: string | null
+          created_at?: string
+          document_id?: string | null
+          event_type: string
+          id?: string
+          user_agent?: string | null
+        }
+        Update: {
+          buyer_email?: string | null
+          created_at?: string
+          document_id?: string | null
+          event_type?: string
+          id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_visitor_logs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "deal_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback: {
         Row: {
           ai_response: string | null
@@ -716,6 +843,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           company: string | null
@@ -773,6 +921,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_public_deal_documents: {
+        Args: never
+        Returns: {
+          category: string
+          created_at: string
+          description: string
+          file_name: string
+          file_size: number
+          id: string
+          title: string
+        }[]
+      }
       get_referral_details: {
         Args: { referrer_uid: string }
         Returns: {
@@ -784,6 +944,13 @@ export type Database = {
           referrer_ip: string
           status: string
         }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       increment_search_count: { Args: never; Returns: undefined }
       increment_shared_view: { Args: { search_id: string }; Returns: undefined }
@@ -799,7 +966,7 @@ export type Database = {
       verify_referral: { Args: never; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -926,6 +1093,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

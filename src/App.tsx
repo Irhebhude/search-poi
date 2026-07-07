@@ -28,6 +28,8 @@ import DeveloperDashboard from "./pages/DeveloperDashboard";
 import AcquisitionControl from "./pages/AcquisitionControl";
 import Pricing from "./pages/Pricing";
 import Insights from "./pages/Insights";
+import DealRoom from "./pages/DealRoom";
+import DealRoomAdmin from "./pages/DealRoomAdmin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +58,8 @@ const App = () => (
             <Route path="/policies" element={<Policies />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/insights" element={<Insights />} />
+            <Route path="/dealroom" element={<DealRoom />} />
+            <Route path="/dealroom/admin" element={<DealRoomAdmin />} />
             <Route path="/trending/:slug" element={<TrendingContent />} />
             <Route path="/waitlist" element={<Waitlist />} />
             <Route path="/premium" element={<Premium />} />
