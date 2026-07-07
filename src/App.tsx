@@ -28,6 +28,8 @@ import DeveloperDashboard from "./pages/DeveloperDashboard";
 import AcquisitionControl from "./pages/AcquisitionControl";
 import Pricing from "./pages/Pricing";
 import Insights from "./pages/Insights";
+import DealRoom from "./pages/DealRoom";
+import DealRoomAdmin from "./pages/DealRoomAdmin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
