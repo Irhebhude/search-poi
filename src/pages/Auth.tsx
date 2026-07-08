@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Mail, Lock, User, Eye, EyeOff, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { lovable } from "@/integrations/lovable/index";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,6 +12,26 @@ const Auth = () => {
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
   const { toast } = useToast();
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast({ title: "Google sign-in failed", description: String(result.error), variant: "destructive" });
+        setGoogleLoading(false);
+        return;
+      }
+      if (result.redirected) return;
+      navigate("/");
+    } catch (err) {
+      toast({ title: "Google sign-in failed", description: err instanceof Error ? err.message : "Try again", variant: "destructive" });
+      setGoogleLoading(false);
+    }
+  };
 
   const referralCode = searchParams.get("ref") || "";
   const [isLogin, setIsLogin] = useState(!referralCode);
