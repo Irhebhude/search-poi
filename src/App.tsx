@@ -30,6 +30,7 @@ import Pricing from "./pages/Pricing";
 import Insights from "./pages/Insights";
 import DealRoom from "./pages/DealRoom";
 import DealRoomAdmin from "./pages/DealRoomAdmin";
+import EngineLanding from "./pages/EngineLanding";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/policies" element={<Policies />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/insights" element={<Insights />} />
+            <Route path="/engine" element={<EngineLanding />} />
             <Route path="/dealroom" element={<DealRoom />} />
             <Route path="/dealroom/admin" element={<DealRoomAdmin />} />
             <Route path="/trending/:slug" element={<TrendingContent />} />
