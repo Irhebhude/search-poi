@@ -42,6 +42,25 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      toast({ title: "Email required", description: "Enter your email above, then tap Forgot password.", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Could not send reset link", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Reset link sent", description: "Check your email for a password reset link." });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -237,6 +256,20 @@ const Auth = () => {
             {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
           </button>
         </form>
+
+        {isLogin && (
+          <div className="mt-3 text-center">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={loading}
+              className="text-sm text-primary hover:underline disabled:opacity-50"
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
+
 
         <div className="mt-6 text-center">
           <button
