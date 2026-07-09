@@ -54,6 +54,7 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/referral" element={<Referral />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/acquisition-control" element={<AcquisitionControl />} />
