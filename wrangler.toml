@@ -1,5 +1,6 @@
 name = "search-poi-engine"
-compatibility_date = "2024-01-01"
+compatibility_date = "2026-04-01"
+compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
 # KV namespace for caching live API results (24h TTL) — stay within free tier.
@@ -7,6 +8,7 @@ pages_build_output_dir = "dist"
 [[kv_namespaces]]
 binding = "CACHE"
 id = "REPLACE_WITH_YOUR_KV_ID"
+preview_id = "REPLACE_WITH_YOUR_KV_PREVIEW_ID"
 
 # D1 SQLite for add-on modules (trips, expenses, ratings, users, sos_logs).
 # Create with: wrangler d1 create search-poi-db
@@ -21,5 +23,9 @@ database_id = "REPLACE_WITH_YOUR_D1_ID"
 binding = "VOICE_NOTES"
 bucket_name = "voice-notes"
 
+# Environment variables
+[vars]
+ENV = "production"
+
 # Secrets (set with `wrangler secret put NAME`):
-#   GOOGLE_API_KEY, MAPBOX_KEY, YELP_API_KEY, ICS_API_KEY
+# GOOGLE_API_KEY, MAPBOX_KEY, YELP_API_KEY, ICS_API_KEY
