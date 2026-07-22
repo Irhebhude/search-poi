@@ -11,7 +11,3 @@ preview_id = "63df4961030744308bb5a05639e2f6df"
 binding = "DB"
 database_name = "search-poi-db"
 database_id = "e5ebcc35-2261-4a93-8949-879e6a07612c"
-
-[[r2_buckets]]
-binding = "VOICE_NOTES"
-bucket_name = "voice-notes"
