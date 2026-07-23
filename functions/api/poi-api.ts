@@ -7,7 +7,7 @@ const CORS = {
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" },
+    headers: {...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 
 export async function onRequest(context) {
@@ -22,7 +22,6 @@ export async function onRequest(context) {
     // --- GET /api/poi-api/ics ---
     if (route === "/poi-api/ics" || route === "/ics") {
       const type = url.searchParams.get("type") || "cash";
-      // TODO: replace with your own DB/KV logic
       return json({ type, data: ["Example danger zone", "Example cash point"] });
     }
 
@@ -31,12 +30,11 @@ export async function onRequest(context) {
       const body = await request.json().catch(() => ({}));
       const q = (body.query || body.q || "").toString().trim();
       if (!q) return json({ error: "query required" }, 400);
-      
-      // TODO: replace with Google/Yelp/D1 search
-      return json({ 
-        success: true, 
+
+      return json({
+        success: true,
         query: q,
-        results: [`Result 1 for ${q}`, `Result 2 for ${q}`] 
+        results: [`Result 1 for ${q}`, `Result 2 for ${q}`]
       });
     }
 
@@ -49,26 +47,50 @@ export async function onRequest(context) {
     if (route === "/poi-api/gps" || route === "/gps") {
       const lat = url.searchParams.get("lat");
       const lon = url.searchParams.get("lon");
-      if (!lat || !lon) return json({ error: "lat and lon required" }, 400);
-      // TODO: replace with your own GPS logic
+      if (!lat ||!lon) return json({ error: "lat and lon required" }, 400);
       return json({ lat, lon, nearby: ["POI 1", "POI 2"] });
     }
 
-    // --- POST /api/poi-api - your main AI endpoint ---
+    // --- POST /api/poi-api - GROQ AI ENDPOINT ---
     if ((route === "/poi-api" || route === "/") && request.method === "POST") {
       const body = await request.json().catch(() => ({}));
       const { query, mode = "default" } = body;
       if (!query) return json({ error: "query required" }, 400);
 
+      const GROQ_KEY = env.GROQ_API_KEY;
+      if (!GROQ_KEY) return json({ error: "GROQ_API_KEY not set in Cloudflare env" }, 500);
+
+      const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [
+            { role: "system", content: `You are SEARCH-POI Engine v1. Mode: ${mode}. Give helpful, structured answers about Lagos/Nigeria businesses and locations.` },
+            { role: "user", content: query }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      if (!aiRes.ok) {
+        const err = await aiRes.text();
+        return json({ error: "AI failed", details: err }, 500);
+      }
+
+      const aiData = await aiRes.json();
+      const answer = aiData.choices[0].message.content;
+
       return json({
         "success": true,
         "data": {
-          "answer": `Cloudflare AI: ${query}`,
-          "key_insights": [`Insight for ${query}`],
-          "recommendations": ["Action 1"],
+          "answer": answer,
+          "key_insights": [],
+          "recommendations": [],
           "mode": mode
         },
-        "meta": { "powered_by": "SEARCH-POI Engine v1 - Cloudflare" }
+        "meta": { "powered_by": "SEARCH-POI Engine v1 - Cloudflare + Groq Llama3" }
       });
     }
 
