@@ -2,12 +2,26 @@ name = "search-poi-engine"
 compatibility_date = "2026-04-01"
 pages_build_output_dir = "dist"
 
+# Cache for live POI / Overpass responses
 [[kv_namespaces]]
 binding = "CACHE"
 id = "61083725182743da80514caf59a03481"
 preview_id = "63df4961030744308bb5a05639e2f6df"
 
+# Primary database (apply ./migrations/0001_init.sql)
 [[d1_databases]]
 binding = "DB"
 database_name = "search-poi-db"
 database_id = "e5ebcc35-2261-4a93-8949-879e6a07612c"
+
+# Deal Room documents and uploads
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "search-poi-files"
+
+[triggers]
+crons = ["0 6 * * *"]
+
+# Secrets (set with `wrangler pages secret put <NAME>`):
+#   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, AUTH_SECRET, ADMIN_EMAILS,
+#   GROQ_API_KEY (or OPENROUTER_API_KEY / GEMINI_API_KEY), AYRSHARE_API_KEY
