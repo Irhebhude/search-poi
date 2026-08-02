@@ -4,7 +4,9 @@ const BASE = `${(import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "")}/ap
 
 const authFetch = (path: string, init?: RequestInit) =>
   fetch(`${BASE}${path}`, {
+    credentials: "include",
     ...init,
+    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
 
 function formatWAT(now: Date) {
