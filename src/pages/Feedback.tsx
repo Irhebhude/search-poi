@@ -8,7 +8,7 @@ import AdSense from "@/components/AdSense";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { z } from "zod";
 
 const feedbackSchema = z.object({
@@ -57,7 +57,7 @@ const Feedback = () => {
     setRatingSubmitted(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke("feedback-ai", {
+      const { data, error } = await api.functions.invoke("feedback-ai", {
         body: result.data,
       });
 

@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import IntentAnalytics from "@/components/IntentAnalytics";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface Business {
@@ -36,7 +36,7 @@ const BusinessDashboard = () => {
   useEffect(() => {
     if (!user) return;
     const fetch = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("businesses")
         .select("*")
         .eq("owner_id", user.id) as any;
@@ -51,7 +51,7 @@ const BusinessDashboard = () => {
     if (!user) return;
     setSubmitting(true);
 
-    const { error } = await supabase.from("businesses").insert({
+    const { error } = await api.from("businesses").insert({
       owner_id: user.id,
       name: form.name,
       category: form.category,
@@ -72,7 +72,7 @@ const BusinessDashboard = () => {
       setShowForm(false);
       setForm({ name: "", category: "general", phone: "", whatsapp: "", email: "", website: "", address: "", city: "", state: "", description: "" });
       // Refresh
-      const { data } = await supabase.from("businesses").select("*").eq("owner_id", user.id) as any;
+      const { data } = await api.from("businesses").select("*").eq("owner_id", user.id) as any;
       if (data) setBusinesses(data);
     }
     setSubmitting(false);

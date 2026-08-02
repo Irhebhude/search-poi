@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, FileText, Lock, Send, Loader2, ShieldCheck } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
@@ -46,11 +46,11 @@ const DealRoom = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.rpc("get_public_deal_documents");
+      const { data } = await api.rpc("get_public_deal_documents");
       setDocs((data as PublicDoc[]) || []);
       setLoading(false);
       // log the visit
-      supabase.from("deal_visitor_logs").insert({
+      api.from("deal_visitor_logs").insert({
         event_type: "view",
         user_agent: navigator.userAgent,
       } as any);
@@ -64,14 +64,14 @@ const DealRoom = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("deal_access_requests").insert({
+    const { error } = await api.from("deal_access_requests").insert({
       document_id: openDoc?.id ?? null,
       buyer_name: name.trim(),
       buyer_email: email.trim(),
       message: message.trim() || null,
     } as any);
     if (!error) {
-      supabase.from("deal_visitor_logs").insert({
+      api.from("deal_visitor_logs").insert({
         event_type: "request",
         buyer_email: email.trim(),
         document_id: openDoc?.id ?? null,

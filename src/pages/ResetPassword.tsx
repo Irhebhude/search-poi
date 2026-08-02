@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Lock, Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,11 +15,11 @@ const ResetPassword = () => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase sets a recovery session from the URL hash on load.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // The API sets a recovery session from the URL token on load.
+    const { data: { subscription } } = api.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || session) setReady(true);
     });
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    api.auth.getSession().then(({ data: { session } }) => {
       if (session) setReady(true);
     });
     return () => subscription.unsubscribe();
@@ -32,7 +32,7 @@ const ResetPassword = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await api.auth.updateUser({ password });
     setLoading(false);
     if (error) {
       toast({ title: "Could not update password", description: error.message, variant: "destructive" });

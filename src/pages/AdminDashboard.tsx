@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Users, UserCheck, UserX, Shield, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { Navigate } from "react-router-dom";
@@ -29,8 +29,8 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     const [statsRes, usersRes] = await Promise.all([
-      supabase.rpc("get_admin_user_stats"),
-      supabase.rpc("get_admin_users_list"),
+      api.rpc("get_admin_user_stats"),
+      api.rpc("get_admin_users_list"),
     ]);
     if (statsRes.data && Array.isArray(statsRes.data) && statsRes.data.length > 0) {
       setStats(statsRes.data[0] as any);
@@ -45,14 +45,14 @@ const AdminDashboard = () => {
     fetchData();
 
     // Real-time subscription to profiles table
-    const channel = supabase
+    const channel = api
       .channel("admin-profiles-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
         fetchData();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { api.removeChannel(channel); };
   }, [user, authLoading]);
 
   const handleRefresh = async () => {

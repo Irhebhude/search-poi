@@ -4,9 +4,8 @@ import { Cpu, Download, Image, FileText, Loader2, X, Search, Sparkles } from "lu
 import ReactMarkdown from "react-markdown";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.VITE_SUPABASE_URL;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const BLUEPRINT_URL = `${BASE}/functions/v1/generate-blueprint`;
+const BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const BLUEPRINT_URL = `${BASE}/api/fn/generate-blueprint`;
 
 interface BlueprintGeneratorProps {
   isOpen: boolean;
@@ -44,7 +43,7 @@ const BlueprintGenerator = ({ isOpen, onClose, initialQuery = "" }: BlueprintGen
       try {
         const resp = await fetch(BLUEPRINT_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: query.trim(), type: "text" }),
         });
         if (!resp.ok || !resp.body) throw new Error("Failed");
@@ -83,7 +82,7 @@ const BlueprintGenerator = ({ isOpen, onClose, initialQuery = "" }: BlueprintGen
       try {
         const resp = await fetch(BLUEPRINT_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: query.trim(), type: "image" }),
         });
         if (!resp.ok) throw new Error("Image generation failed");

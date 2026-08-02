@@ -7,9 +7,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.VITE_SUPABASE_URL;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const GUIDE_URL = `${BASE}/functions/v1/generate-build-guide`;
+const BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const GUIDE_URL = `${BASE}/api/fn/generate-build-guide`;
 
 interface Material {
   name: string;
@@ -110,13 +109,13 @@ const BuildGuideViewer = ({ isOpen, onClose, initialQuery = "" }: BuildGuideView
     // Fetch structured guide + videos in parallel
     const guidePromise = fetch(GUIDE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: query.trim(), action: "structured" }),
     });
 
     const videosPromise = fetch(GUIDE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: query.trim() }),
     });
 
@@ -163,7 +162,7 @@ const BuildGuideViewer = ({ isOpen, onClose, initialQuery = "" }: BuildGuideView
       try {
         const resp = await fetch(GUIDE_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             query: `${g.title} - Step ${step.stepNumber}: ${step.title}. ${step.instruction}`,
             action: "step_image",

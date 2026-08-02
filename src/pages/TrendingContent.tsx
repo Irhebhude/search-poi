@@ -5,7 +5,7 @@ import { ArrowLeft, Eye, Calendar, Tag } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface ContentData {
   id: string;
@@ -27,7 +27,7 @@ const TrendingContentPage = () => {
   useEffect(() => {
     if (!slug) return;
     const fetchContent = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await api
         .from("trending_content" as any)
         .select("*")
         .eq("slug", slug)
@@ -36,7 +36,7 @@ const TrendingContentPage = () => {
       if (data) {
         setContent(data as any);
         // Increment view count
-        await supabase
+        await api
           .from("trending_content" as any)
           .update({ view_count: (data as any).view_count + 1 })
           .eq("id", (data as any).id);

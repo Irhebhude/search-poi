@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-const BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/poi-live`;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const BASE = `${(import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "")}/api/poi-live`;
 
 const authFetch = (path: string, init?: RequestInit) =>
   fetch(`${BASE}${path}`, {
+    credentials: "include",
     ...init,
-    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", ...(init?.headers || {}) },
+    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
 
 function formatWAT(now: Date) {

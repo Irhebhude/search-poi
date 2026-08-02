@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, MapPin } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface TrendItem {
   query: string;
@@ -14,7 +14,7 @@ const IntentAnalytics = () => {
 
   useEffect(() => {
     const fetchTrends = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("trending_searches")
         .select("query, search_count")
         .order("search_count", { ascending: false })

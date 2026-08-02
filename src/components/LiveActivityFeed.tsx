@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Activity, Search, Zap } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface ActivityItem {
   id: string;
@@ -17,7 +17,7 @@ const LiveActivityFeed = () => {
   useEffect(() => {
     // Fetch recent activity
     const fetchRecent = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("search_activity" as any)
         .select("id, query, search_mode, created_at")
         .order("created_at", { ascending: false })
@@ -27,7 +27,7 @@ const LiveActivityFeed = () => {
     fetchRecent();
 
     // Realtime subscription
-    const channel = supabase
+    const channel = api
       .channel("live-search-activity")
       .on("postgres_changes", {
         event: "INSERT",
@@ -40,7 +40,7 @@ const LiveActivityFeed = () => {
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { api.removeChannel(channel); };
   }, []);
 
   const timeAgo = (dateStr: string) => {

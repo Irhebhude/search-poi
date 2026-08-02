@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Gift, Copy, Check, Users, Trophy, Share2, ExternalLink, ShieldAlert, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
@@ -42,14 +42,14 @@ const Referral = () => {
 
     const fetchStats = async () => {
       const [referralsRes, rewardsRes] = await Promise.all([
-        supabase.from("referrals").select("status").eq("referrer_id", user.id),
-        supabase.from("referral_rewards").select("id").eq("user_id", user.id),
+        api.from("referrals").select("status").eq("referrer_id", user.id),
+        api.from("referral_rewards").select("id").eq("user_id", user.id),
       ]);
 
       const referrals = referralsRes.data || [];
 
       // Fetch detailed referral info with IP check
-      const { data: details } = await supabase.rpc("get_referral_details", { referrer_uid: user.id });
+      const { data: details } = await api.rpc("get_referral_details", { referrer_uid: user.id });
       const detailsList = (details || []) as ReferralDetail[];
       setReferralDetails(detailsList);
 

@@ -6,7 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 const BENEFITS = [
   { icon: Zap, title: "AI-Powered Search", desc: "Instant answers with deep reasoning across the entire web" },
@@ -25,7 +25,7 @@ const Waitlist = () => {
     if (!form.full_name.trim() || !form.email.trim()) return;
     setStatus("loading");
 
-    const { error } = await supabase.from("waitlist" as any).insert([{
+    const { error } = await api.from("waitlist" as any).insert([{
       full_name: form.full_name.trim(),
       email: form.email.trim().toLowerCase(),
       company: form.company.trim() || null,

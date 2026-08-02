@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Brain, Eye, Zap, Search, ExternalLink } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 import ShareButtons from "@/components/ShareButtons";
 
@@ -23,14 +23,14 @@ const SharedSearch = () => {
   useEffect(() => {
     if (!slug) return;
     (async () => {
-      const { data: row } = await supabase
+      const { data: row } = await api
         .from("shared_searches")
         .select("*")
         .eq("slug", slug)
         .single();
       if (row) {
         setData(row as SharedSearch);
-        supabase.rpc("increment_shared_view" as any, { search_id: row.id });
+        api.rpc("increment_shared_view" as any, { search_id: row.id });
       }
       setLoading(false);
     })();
