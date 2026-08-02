@@ -4,7 +4,7 @@ import { Key, Copy, Check, Trash2, Plus, Code, BarChart3, Zap, Eye, EyeOff, Play
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -50,13 +50,13 @@ const DeveloperDashboard = () => {
   }, [user]);
 
   const fetchKeys = async () => {
-    const { data } = await supabase.from("api_keys" as any).select("*").order("created_at", { ascending: false });
+    const { data } = await api.from("api_keys" as any).select("*").order("created_at", { ascending: false });
     setKeys((data as any[]) || []);
     setLoading(false);
   };
 
   const fetchUsage = async () => {
-    const { data } = await supabase.from("api_usage_log" as any).select("*").order("created_at", { ascending: false }).limit(50);
+    const { data } = await api.from("api_usage_log" as any).select("*").order("created_at", { ascending: false }).limit(50);
     setUsage((data as any[]) || []);
   };
 
@@ -70,7 +70,7 @@ const DeveloperDashboard = () => {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const keyHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-    const { error } = await supabase.from("api_keys" as any).insert({
+    const { error } = await api.from("api_keys" as any).insert({
       user_id: user!.id,
       key_hash: keyHash,
       key_prefix: prefix,
@@ -88,7 +88,7 @@ const DeveloperDashboard = () => {
   };
 
   const deleteKey = async (id: string) => {
-    await supabase.from("api_keys" as any).delete().eq("id", id);
+    await api.from("api_keys" as any).delete().eq("id", id);
     toast({ title: "Key deleted" });
     fetchKeys();
   };
@@ -104,7 +104,7 @@ const DeveloperDashboard = () => {
     setTesting(true);
     setTestResult(null);
     try {
-      const resp = await supabase.functions.invoke("poi-api", {
+      const resp = await api.functions.invoke("poi-api", {
         body: { query: testQuery, mode: "default" },
         headers: { "x-api-key": "test-from-dashboard" },
       });

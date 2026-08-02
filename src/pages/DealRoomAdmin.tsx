@@ -4,7 +4,7 @@ import {
   Zap, Upload, Trash2, Loader2, ShieldAlert, LogOut, Check, X, Copy,
   FileText, Eye, Inbox, ClipboardList, Lock, Mail,
 } from "lucide-react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useToast } from "@/hooks/use-toast";
@@ -96,9 +96,9 @@ const DealRoomAdmin = () => {
 
   const loadAll = useCallback(async () => {
     const [d, r, l] = await Promise.all([
-      supabase.from("deal_documents").select("*").order("created_at", { ascending: false }),
-      supabase.from("deal_access_requests").select("*").order("created_at", { ascending: false }),
-      supabase.from("deal_visitor_logs").select("*").order("created_at", { ascending: false }).limit(200),
+      api.from("deal_documents").select("*").order("created_at", { ascending: false }),
+      api.from("deal_access_requests").select("*").order("created_at", { ascending: false }),
+      api.from("deal_visitor_logs").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     setDocs((d.data as Doc[]) || []);
     setRequests((r.data as AccessReq[]) || []);
@@ -132,13 +132,13 @@ const DealRoomAdmin = () => {
     }
     setUploading(true);
     const path = `${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const { error: upErr } = await supabase.storage.from("deal-room-docs").upload(path, file);
+    const { error: upErr } = await api.storage.from("deal-room-docs").upload(path, file);
     if (upErr) {
       setUploading(false);
       toast({ title: "Upload failed", description: upErr.message, variant: "destructive" });
       return;
     }
-    const { error: insErr } = await supabase.from("deal_documents").insert({
+    const { error: insErr } = await api.from("deal_documents").insert({
       title: title.trim(), description: description.trim() || null, category,
       file_path: path, file_name: file.name, file_size: file.size, mime_type: file.type,
       uploaded_by: user.id,
@@ -155,14 +155,14 @@ const DealRoomAdmin = () => {
   };
 
   const deleteDoc = async (d: Doc) => {
-    await supabase.storage.from("deal-room-docs").remove([d.file_path]);
-    await supabase.from("deal_documents").delete().eq("id", d.id);
+    await api.storage.from("deal-room-docs").remove([d.file_path]);
+    await api.from("deal_documents").delete().eq("id", d.id);
     toast({ title: "Deleted" });
     loadAll();
   };
 
   const decide = async (id: string, action: "approve" | "deny") => {
-    const { data, error } = await supabase.functions.invoke("deal-room-approve", {
+    const { data, error } = await api.functions.invoke("deal-room-approve", {
       body: { requestId: id, action },
     });
     if (error) {

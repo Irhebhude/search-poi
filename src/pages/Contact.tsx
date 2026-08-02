@@ -8,7 +8,7 @@ import AdSense from "@/components/AdSense";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const contactSchema = z.object({
   full_name: z.string().trim().min(1, "Name is required").max(100),
@@ -49,7 +49,7 @@ const Contact = () => {
       return;
     }
     setStatus("loading");
-    const { error } = await supabase.from("contact_messages").insert([{
+    const { error } = await api.from("contact_messages").insert([{
       full_name: result.data.full_name,
       email: result.data.email,
       subject: result.data.subject,

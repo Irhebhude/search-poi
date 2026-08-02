@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { AuthUser as User, AuthSession as Session } from "@/lib/api";
 
 interface Profile {
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data } = await api
       .from("profiles")
       .select("*")
       .eq("id", userId)
@@ -59,12 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const toggleLiteMode = async () => {
     if (!user || !profile) return;
     const newVal = !profile.lite_mode;
-    await supabase.from("profiles").update({ lite_mode: newVal } as any).eq("id", user.id);
+    await api.from("profiles").update({ lite_mode: newVal } as any).eq("id", user.id);
     setProfile((p) => p ? { ...p, lite_mode: newVal } : p);
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = api.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    api.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) fetchProfile(session.user.id);
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, displayName: string, referralCode?: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await api.auth.signUp({
       email,
       password,
       options: {
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (referralCode && data.user) {
       setTimeout(async () => {
-        await supabase.rpc("process_referral", { referral_code_input: referralCode });
+        await api.rpc("process_referral", { referral_code_input: referralCode });
       }, 1000);
     }
 
@@ -108,12 +108,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await api.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
 
     const pendingCode = localStorage.getItem("pending_referral_code");
     if (pendingCode) {
-      await supabase.rpc("process_referral", { referral_code_input: pendingCode });
+      await api.rpc("process_referral", { referral_code_input: pendingCode });
       localStorage.removeItem("pending_referral_code");
     }
 
@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await api.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);

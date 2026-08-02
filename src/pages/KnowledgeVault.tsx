@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Eye, Zap, Search, ChevronDown, ChevronRight } from "lucide-react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 import ShareButtons from "@/components/ShareButtons";
 
@@ -33,14 +33,14 @@ const KnowledgeVault = () => {
   useEffect(() => {
     if (!slug) return;
     (async () => {
-      const { data: v } = await supabase
+      const { data: v } = await api
         .from("knowledge_vaults")
         .select("*")
         .eq("slug", slug)
         .single();
       if (v) {
         setVault(v as Vault);
-        const { data: vItems } = await supabase
+        const { data: vItems } = await api
           .from("knowledge_vault_items")
           .select("*")
           .eq("vault_id", v.id)

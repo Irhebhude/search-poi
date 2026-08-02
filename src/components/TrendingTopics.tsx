@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TrendingUp, Flame, ArrowRight } from "lucide-react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface TrendingItem {
   query: string;
@@ -16,7 +16,7 @@ const TrendingTopics = () => {
 
   useEffect(() => {
     const fetchTrending = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("trending_searches" as any)
         .select("query, search_count, last_searched_at")
         .order("search_count", { ascending: false })
@@ -26,14 +26,14 @@ const TrendingTopics = () => {
     fetchTrending();
 
     // Real-time updates
-    const channel = supabase
+    const channel = api
       .channel("trending-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "trending_searches" }, () => {
         fetchTrending();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { api.removeChannel(channel); };
   }, []);
 
   if (trending.length === 0) return null;

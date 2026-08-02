@@ -4,7 +4,7 @@ import { TrendingUp, Eye, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface InsightArticle {
   id: string;
@@ -35,7 +35,7 @@ const Insights = () => {
 
   useEffect(() => {
     const fetchContent = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("trending_content")
         .select("*")
         .order("view_count", { ascending: false })

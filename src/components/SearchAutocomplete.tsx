@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, TrendingUp, Clock, MapPin, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { getSearchHistory } from "@/lib/search-context";
 
 interface SearchAutocompleteProps {
@@ -24,7 +24,7 @@ const SearchAutocomplete = ({ query, isOpen, onSelect, onClose }: SearchAutocomp
   // Fetch trending searches
   useEffect(() => {
     const fetchTrending = async () => {
-      const { data } = await supabase
+      const { data } = await api
         .from("trending_searches" as any)
         .select("query, search_count")
         .order("search_count", { ascending: false })
@@ -34,14 +34,14 @@ const SearchAutocomplete = ({ query, isOpen, onSelect, onClose }: SearchAutocomp
     fetchTrending();
 
     // Realtime subscription for trending updates
-    const channel = supabase
+    const channel = api
       .channel("trending-updates")
       .on("postgres_changes", { event: "*", schema: "public", table: "trending_searches" }, () => {
         fetchTrending();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { api.removeChannel(channel); };
   }, []);
 
   // Location autocomplete via Nominatim (free, no key)

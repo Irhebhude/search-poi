@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BookOpen, Plus, Check, Loader2 } from "lucide-react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,7 +27,7 @@ const SaveToVaultButton = ({ query, answer, sources = [] }: SaveToVaultButtonPro
 
   useEffect(() => {
     if (!open || !user) return;
-    supabase.from("knowledge_vaults").select("id, name, slug").eq("user_id", user.id).then(({ data }) => {
+    api.from("knowledge_vaults").select("id, name, slug").eq("user_id", user.id).then(({ data }) => {
       setVaults((data || []) as Vault[]);
     });
   }, [open, user]);
@@ -37,7 +37,7 @@ const SaveToVaultButton = ({ query, answer, sources = [] }: SaveToVaultButtonPro
     setSaving(true);
     const slug = newVaultName.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, "-").slice(0, 50) + "-" + Math.random().toString(36).slice(2, 6);
     
-    const { data: vault, error } = await supabase.from("knowledge_vaults").insert({
+    const { data: vault, error } = await api.from("knowledge_vaults").insert({
       user_id: user.id,
       name: newVaultName.trim(),
       slug,
@@ -55,7 +55,7 @@ const SaveToVaultButton = ({ query, answer, sources = [] }: SaveToVaultButtonPro
 
   const saveToVault = async (vaultId: string) => {
     setSaving(true);
-    const { error } = await supabase.from("knowledge_vault_items").insert({
+    const { error } = await api.from("knowledge_vault_items").insert({
       vault_id: vaultId,
       query,
       answer,

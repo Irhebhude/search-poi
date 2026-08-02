@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Share2, Download, Loader2, Check } from "lucide-react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -32,7 +32,7 @@ const SmartShareButton = ({ query, answer, sources = [] }: SmartShareButtonProps
     setSaving(true);
     const slug = generateSlug(query);
 
-    const { error } = await supabase.from("shared_searches").insert({
+    const { error } = await api.from("shared_searches").insert({
       user_id: user.id,
       query,
       answer,

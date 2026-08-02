@@ -4,7 +4,7 @@ import { Star, Gift, CheckCircle, Clock, Trophy, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 
@@ -34,9 +34,9 @@ const POIPointsDashboard = () => {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      supabase.from("poi_tasks").select("*").eq("is_active", true),
-      supabase.from("poi_task_completions").select("task_id, status").eq("user_id", user.id),
-      supabase.from("poi_points_log").select("points, reason, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
+      api.from("poi_tasks").select("*").eq("is_active", true),
+      api.from("poi_task_completions").select("task_id, status").eq("user_id", user.id),
+      api.from("poi_points_log").select("points, reason, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
     ]).then(([tasksRes, compRes, logRes]) => {
       setTasks((tasksRes.data || []) as POITask[]);
       setCompletions((compRes.data || []) as TaskCompletion[]);
@@ -47,7 +47,7 @@ const POIPointsDashboard = () => {
 
   const handleCompleteTask = async (task: POITask) => {
     if (!user) return;
-    const { error } = await supabase.from("poi_task_completions").insert({
+    const { error } = await api.from("poi_task_completions").insert({
       task_id: task.id,
       user_id: user.id,
       status: "completed",
@@ -64,7 +64,7 @@ const POIPointsDashboard = () => {
     }
 
     // Award points
-    await supabase.rpc("award_poi_points", {
+    await api.rpc("award_poi_points", {
       target_user_id: user.id,
       amount: task.points_reward,
       point_reason: `Completed: ${task.title}`,

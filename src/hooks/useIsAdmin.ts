@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useIsAdmin() {
@@ -14,7 +14,7 @@ export function useIsAdmin() {
         if (active) { setIsAdmin(false); setLoading(false); }
         return;
       }
-      const { data } = await supabase
+      const { data } = await api
         .from("user_roles")
         .select("id")
         .eq("user_id", user.id)

@@ -4,7 +4,7 @@ import { Crown, Check, Zap, Shield, Brain, BarChart3, Upload } from "lucide-reac
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/contexts/AuthContext";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 const PREMIUM_FEATURES = [
@@ -28,7 +28,7 @@ const Premium = () => {
     }
     setActivating(true);
     // Mock premium activation
-    await supabase.from("profiles").update({ is_premium: true, premium_since: new Date().toISOString() } as any).eq("id", user.id);
+    await api.from("profiles").update({ is_premium: true, premium_since: new Date().toISOString() } as any).eq("id", user.id);
     await refreshProfile();
     setActivating(false);
     toast({ title: "🎉 Welcome to Premium!", description: "All premium features are now active." });

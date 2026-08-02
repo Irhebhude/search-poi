@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Shield, Send, Sparkles, RefreshCw, ExternalLink, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { api as supabase } from "@/lib/api";
+import { api } from "@/lib/api";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { Navigate } from "react-router-dom";
@@ -33,7 +33,7 @@ const AcquisitionControl = () => {
   const generateContent = async () => {
     setGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ayrshare-post", {
+      const { data, error } = await api.functions.invoke("ayrshare-post", {
         body: { action: "generate" },
       });
       if (error) throw error;
@@ -50,7 +50,7 @@ const AcquisitionControl = () => {
     if (!draftContent.trim()) return;
     setPosting(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ayrshare-post", {
+      const { data, error } = await api.functions.invoke("ayrshare-post", {
         body: { action: "post", customPost: draftContent, mediaUrl: mediaUrl || undefined },
       });
       if (error) throw error;
@@ -85,7 +85,7 @@ const AcquisitionControl = () => {
 
   const loadHistory = async () => {
     try {
-      const { data } = await supabase.functions.invoke("ayrshare-post", {
+      const { data } = await api.functions.invoke("ayrshare-post", {
         body: { action: "history" },
       });
       if (Array.isArray(data)) {
