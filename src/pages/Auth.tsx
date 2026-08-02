@@ -40,8 +40,7 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { api: supabase } = await import("@/lib/api");
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await api.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
@@ -84,8 +83,7 @@ const Auth = () => {
           const ipRes = await fetch("https://api.ipify.org?format=json");
           const ipData = await ipRes.json();
           if (ipData.ip) {
-            const { api: supabase } = await import("@/lib/api");
-            await supabase.rpc("update_signup_ip", { ip_address: ipData.ip });
+            await api.rpc("update_signup_ip", { ip_address: ipData.ip });
           }
         } catch (e) {
           console.warn("Could not capture IP:", e);

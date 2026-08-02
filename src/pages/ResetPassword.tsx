@@ -15,7 +15,7 @@ const ResetPassword = () => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase sets a recovery session from the URL hash on load.
+    // The API sets a recovery session from the URL token on load.
     const { data: { subscription } } = api.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || session) setReady(true);
     });
