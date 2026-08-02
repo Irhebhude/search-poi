@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Mail, Lock, User, Eye, EyeOff, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { lovable } from "@/integrations/lovable/index";
+import { api } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,16 +17,7 @@ const Auth = () => {
   const handleGoogle = async () => {
     setGoogleLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast({ title: "Google sign-in failed", description: String(result.error), variant: "destructive" });
-        setGoogleLoading(false);
-        return;
-      }
-      if (result.redirected) return;
-      navigate("/");
+      await api.auth.signInWithGoogle("/");
     } catch (err) {
       toast({ title: "Google sign-in failed", description: err instanceof Error ? err.message : "Try again", variant: "destructive" });
       setGoogleLoading(false);
@@ -49,7 +40,7 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { supabase } = await import("@/integrations/supabase/client");
+    const { api: supabase } = await import("@/lib/api");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -93,7 +84,7 @@ const Auth = () => {
           const ipRes = await fetch("https://api.ipify.org?format=json");
           const ipData = await ipRes.json();
           if (ipData.ip) {
-            const { supabase } = await import("@/integrations/supabase/client");
+            const { api: supabase } = await import("@/lib/api");
             await supabase.rpc("update_signup_ip", { ip_address: ipData.ip });
           }
         } catch (e) {
