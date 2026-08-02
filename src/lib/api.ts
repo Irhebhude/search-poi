@@ -46,7 +46,7 @@ export interface AuthSession {
 
 export interface Result<T> {
   data: T | null;
-  error: { message: string } | null;
+  error: { message: string; code?: string } | null;
 }
 
 type Filter = { column: string; op: string; value: unknown };
@@ -181,7 +181,7 @@ class Channel {
   private timer: ReturnType<typeof setInterval> | null = null;
   private intervalMs = 15000;
 
-  on(_event: string, _filter: unknown, handler: () => void) {
+  on(_event: string, _filter: unknown, handler: (payload?: any) => void) {
     this.handlers.push(handler);
     return this;
   }
@@ -190,7 +190,7 @@ class Channel {
     this.timer = setInterval(() => this.handlers.forEach((h) => h()), this.intervalMs);
     return this;
   }
-  unsubscribe() {
+  unsubscribe(): void {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
   }
@@ -232,13 +232,15 @@ const auth = {
     return {
       data: {
         subscription: {
-          unsubscribe: () => listeners.delete(cb),
+          unsubscribe: (): void => {
+            listeners.delete(cb);
+          },
         },
       },
     };
   },
 
-  async signUp(params: { email: string; password: string; options?: { data?: Record<string, unknown> } }) {
+  async signUp(params: { email: string; password: string; options?: { data?: Record<string, unknown>; emailRedirectTo?: string } }) {
     try {
       const res = await request<{ session: AuthSession }>("/api/auth/sign-up/email", {
         method: "POST",
@@ -376,10 +378,11 @@ export const api = {
   },
 
   functions: {
-    async invoke<T = any>(name: string, opts?: { body?: unknown }): Promise<Result<T>> {
+    async invoke<T = any>(name: string, opts?: { body?: unknown; headers?: Record<string, string> }): Promise<Result<T>> {
       try {
         const res = await request<T>(`/api/fn/${name}`, {
           method: "POST",
+          headers: opts?.headers,
           body: JSON.stringify(opts?.body ?? {}),
         });
         return { data: res, error: null };
@@ -390,7 +393,7 @@ export const api = {
   },
 
   channel: (_name: string) => new Channel(),
-  removeChannel: (channel: Channel) => channel.unsubscribe(),
+  removeChannel: (channel: Channel): void => channel.unsubscribe(),
 
   auth,
   storage,
