@@ -43,7 +43,7 @@ const BlueprintGenerator = ({ isOpen, onClose, initialQuery = "" }: BlueprintGen
       try {
         const resp = await fetch(BLUEPRINT_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: query.trim(), type: "text" }),
         });
         if (!resp.ok || !resp.body) throw new Error("Failed");
@@ -82,7 +82,7 @@ const BlueprintGenerator = ({ isOpen, onClose, initialQuery = "" }: BlueprintGen
       try {
         const resp = await fetch(BLUEPRINT_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: query.trim(), type: "image" }),
         });
         if (!resp.ok) throw new Error("Image generation failed");

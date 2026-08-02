@@ -109,13 +109,13 @@ const BuildGuideViewer = ({ isOpen, onClose, initialQuery = "" }: BuildGuideView
     // Fetch structured guide + videos in parallel
     const guidePromise = fetch(GUIDE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: query.trim(), action: "structured" }),
     });
 
     const videosPromise = fetch(GUIDE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: query.trim() }),
     });
 
@@ -162,7 +162,7 @@ const BuildGuideViewer = ({ isOpen, onClose, initialQuery = "" }: BuildGuideView
       try {
         const resp = await fetch(GUIDE_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             query: `${g.title} - Step ${step.stepNumber}: ${step.title}. ${step.instruction}`,
             action: "step_image",
