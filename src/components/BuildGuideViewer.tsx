@@ -7,9 +7,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.VITE_SUPABASE_URL;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const GUIDE_URL = `${BASE}/functions/v1/generate-build-guide`;
+const BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const GUIDE_URL = `${BASE}/api/fn/generate-build-guide`;
 
 interface Material {
   name: string;

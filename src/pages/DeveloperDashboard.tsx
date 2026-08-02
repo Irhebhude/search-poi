@@ -116,7 +116,7 @@ const DeveloperDashboard = () => {
     }
   };
 
-  const BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/poi-api`;
+  const BASE_URL = `${window.location.origin}/api/poi-api`;
 
   return (
     <div className="min-h-screen bg-background">

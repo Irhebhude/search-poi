@@ -1,12 +1,11 @@
-const BASE = import.meta.env.VITE_SUPABASE_URL;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const CHAT_URL = `${BASE}/functions/v1/search-ai`;
-const WEB_SEARCH_URL = `${BASE}/functions/v1/web-search`;
-const SUMMARIZE_URL = `${BASE}/functions/v1/summarize-url`;
-const IMAGE_SEARCH_URL = `${BASE}/functions/v1/image-search`;
-const VIDEO_SEARCH_URL = `${BASE}/functions/v1/video-search`;
-const NEWS_SEARCH_URL = `${BASE}/functions/v1/news-search`;
-const POI_LIVE_URL = `${BASE}/functions/v1/poi-live-search`;
+const BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const CHAT_URL = `${BASE}/api/fn/search-ai`;
+const WEB_SEARCH_URL = `${BASE}/api/fn/web-search`;
+const SUMMARIZE_URL = `${BASE}/api/fn/summarize-url`;
+const IMAGE_SEARCH_URL = `${BASE}/api/fn/image-search`;
+const VIDEO_SEARCH_URL = `${BASE}/api/fn/video-search`;
+const NEWS_SEARCH_URL = `${BASE}/api/fn/news-search`;
+const POI_LIVE_URL = `${BASE}/api/fn/poi-live-search`;
 
 export interface LivePOI {
   id: string;
@@ -33,7 +32,6 @@ export async function livePoiSearch(query: string, limit = 50): Promise<LivePOIR
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, limit }),
   });
@@ -69,7 +67,6 @@ export async function webSearch(query: string, limit = 10): Promise<WebResult[]>
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, limit }),
   });
@@ -105,7 +102,6 @@ export async function streamSearch({
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, mode, context }),
   });
@@ -171,7 +167,6 @@ export async function summarizeUrl(url: string): Promise<string> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ url }),
   });
@@ -199,7 +194,6 @@ export async function imageSearch(query: string, limit = 20): Promise<ImageResul
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, limit }),
   });
@@ -228,7 +222,6 @@ export async function videoSearch(query: string, limit = 20): Promise<VideoResul
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, limit }),
   });
@@ -256,7 +249,6 @@ export async function newsSearch(query: string, limit = 20): Promise<NewsResult[
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({ query, limit }),
   });

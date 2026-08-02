@@ -4,9 +4,8 @@ import { Cpu, Download, Image, FileText, Loader2, X, Search, Sparkles } from "lu
 import ReactMarkdown from "react-markdown";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.VITE_SUPABASE_URL;
-const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const BLUEPRINT_URL = `${BASE}/functions/v1/generate-blueprint`;
+const BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const BLUEPRINT_URL = `${BASE}/api/fn/generate-blueprint`;
 
 interface BlueprintGeneratorProps {
   isOpen: boolean;
