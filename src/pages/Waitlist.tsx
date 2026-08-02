@@ -6,7 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 
 const BENEFITS = [
   { icon: Zap, title: "AI-Powered Search", desc: "Instant answers with deep reasoning across the entire web" },

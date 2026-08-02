@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BookOpen, Plus, Check, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 

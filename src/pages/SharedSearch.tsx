@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Brain, Eye, Zap, Search, ExternalLink } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 import ShareButtons from "@/components/ShareButtons";
 

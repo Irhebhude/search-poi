@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Gift, Copy, Check, Users, Trophy, Share2, ExternalLink, ShieldAlert, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";

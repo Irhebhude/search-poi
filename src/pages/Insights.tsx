@@ -4,7 +4,7 @@ import { TrendingUp, Eye, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 
 interface InsightArticle {
   id: string;

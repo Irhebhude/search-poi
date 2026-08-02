@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, TrendingUp, Clock, MapPin, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import { getSearchHistory } from "@/lib/search-context";
 
 interface SearchAutocompleteProps {

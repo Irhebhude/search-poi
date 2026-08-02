@@ -8,7 +8,7 @@ import AdSense from "@/components/AdSense";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 
 const contactSchema = z.object({
   full_name: z.string().trim().min(1, "Name is required").max(100),

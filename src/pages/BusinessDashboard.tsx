@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
 import IntentAnalytics from "@/components/IntentAnalytics";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface Business {

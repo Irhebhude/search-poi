@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Clock, AlertCircle, Globe, Image, Video, Newspaper, Cpu, Hammer, MapPin, Brain, Shield, FileText } from "lucide-react";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import SearchBar from "@/components/SearchBar";
 import AIAnswer from "@/components/AIAnswer";
 import WebSearchResults from "@/components/WebSearchResults";

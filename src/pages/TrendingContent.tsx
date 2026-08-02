@@ -5,7 +5,7 @@ import { ArrowLeft, Eye, Calendar, Tag } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Header from "@/components/Header";
 import SEOHead from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 
 interface ContentData {
   id: string;

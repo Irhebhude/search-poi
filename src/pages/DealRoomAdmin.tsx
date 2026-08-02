@@ -4,7 +4,7 @@ import {
   Zap, Upload, Trash2, Loader2, ShieldAlert, LogOut, Check, X, Copy,
   FileText, Eye, Inbox, ClipboardList, Lock, Mail,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useToast } from "@/hooks/use-toast";

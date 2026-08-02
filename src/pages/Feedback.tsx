@@ -8,7 +8,7 @@ import AdSense from "@/components/AdSense";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { api as supabase } from "@/lib/api";
 import { z } from "zod";
 
 const feedbackSchema = z.object({
