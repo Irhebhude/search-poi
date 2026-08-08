@@ -136,7 +136,7 @@ export async function createOrganization(env: Env, userId: string, name: string,
   await env.DB.prepare(
     `INSERT INTO org_members (id, org_id, user_id, role, status, created_at) VALUES (?,?,?,'owner','active',?)`,
   ).bind(uid(), id, userId, ts).run();
-  await audit(env, { env: undefined as never, orgId: id, actorId: userId, action: "org.created", resourceType: "organization", resourceId: id, request } as never);
+  await audit(env, { orgId: id, actorId: userId, action: "org.created", resourceType: "organization", resourceId: id, request });
   return { id, name, slug, plan: "free" };
 }
 
