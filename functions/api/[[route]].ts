@@ -10,6 +10,12 @@ import {
   verifyPassword, type Env,
 } from "./_lib/auth";
 import { runTableQuery } from "./_lib/db";
+import { handleAnalyticsRoute } from "./_lib/analytics";
+import { handleOrgRoute } from "./_lib/tenancy";
+import { handleRagRoute } from "./_lib/rag";
+import { handleSupportRoute } from "./_lib/support";
+import { handleV1Route, openApiDocument } from "./_lib/devplatform";
+import { HttpError } from "./_lib/util";
 import { runRpc } from "./_lib/rpc";
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
@@ -50,6 +56,7 @@ export const onRequest = async (ctx: Ctx): Promise<Response> => {
     const res = await route(head, rest, request, env, url);
     return withCors(res, origin);
   } catch (e) {
+    if (e instanceof HttpError) return withCors(json({ error: e.message }, e.status), origin);
     const message = e instanceof Error ? e.message : "Unexpected error";
     const status = /required|Forbidden|Unauthor/i.test(message) ? (/Forbidden/.test(message) ? 403 : 401) : 400;
     return withCors(json({ error: message }, status), origin);
@@ -164,6 +171,21 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
 
   const session = await getSession(request, env);
   const actor = { userId: session.userId, isAdmin: session.isAdmin };
+  const sessionCtx = { user: (session as any).user ?? null };
+
+  /* -------------------------- enterprise modules -------------------------- */
+  if (head === "v1") return handleV1Route(rest, request, env as any, await readJson(request));
+  if (head === "openapi.json") return json(openApiDocument(url.origin));
+  if (head === "orgs") return handleOrgRoute(rest, request, env, await readJson(request), sessionCtx);
+  if (head === "rag") return handleRagRoute(rest, request, env as any, await readJson(request), sessionCtx);
+  if (head === "support") {
+    const isUpload = rest[0] === "upload";
+    return handleSupportRoute(rest, request, env, isUpload ? {} : await readJson(request), sessionCtx);
+  }
+  if (head === "events" || head === "analytics") {
+    const segs = head === "events" ? ["events", ...rest] : rest;
+    return handleAnalyticsRoute(segs, request, env, await readJson(request), sessionCtx);
+  }
 
   /* -------------------------------- data --------------------------------- */
   if (head === "db") {
