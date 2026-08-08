@@ -26,17 +26,16 @@ const LiveActivityFeed = () => {
     };
     fetchRecent();
 
-    // Realtime subscription
+    // Live updates (polling channel over the REST API)
     const channel = api
       .channel("live-search-activity")
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
         table: "search_activity",
-      }, (payload) => {
-        const newItem = payload.new as ActivityItem;
-        setActivities(prev => [newItem, ...prev].slice(0, 8));
-        setLiveCount(c => c + 1);
+      }, () => {
+        fetchRecent();
+        setLiveCount((c) => c + 1);
       })
       .subscribe();
 
