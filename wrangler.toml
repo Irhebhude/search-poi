@@ -8,7 +8,7 @@ binding = "CACHE"
 id = "61083725182743da80514caf59a03481"
 preview_id = "63df4961030744308bb5a05639e2f6df"
 
-# Primary database (apply./migrations/0001_init.sql)
+# Primary database
 [[d1_databases]]
 binding = "DB"
 database_name = "search-poi-db"
@@ -23,8 +23,4 @@ bucket_name = "search-poi-files"
 [ai]
 binding = "AI"
 
-# Vector index for semantic search (768 dims, cosine)
-# Create once: wrangler vectorize create search-poi-index --dimensions=768 --metric=cosine
-[[vectorize]]
-binding = "VECTORIZE"
-index_name = "search-poi-index"
+# VECTORIZE REMOVED - using D1 for embeddings instead
