@@ -169,11 +169,36 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     return json({ error: "Unknown auth route" }, 404);
   }
 
+  /* ----------------------- runtime capability report ---------------------- */
+  if (head === "config") {
+    return json({
+      google: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+      storage: Boolean(env.BUCKET),
+      ai: Boolean(env.GROQ_API_KEY || env.OPENROUTER_API_KEY || env.GEMINI_API_KEY || (env as any).AI),
+      vectorSearch: Boolean((env as any).AI),
+      cache: Boolean(env.CACHE),
+      database: Boolean(env.DB),
+    });
+  }
+
+  /* --------------------- D1 + Workers AI semantic search ------------------- */
+  if (head === "semantic-search") {
+    const body = await readJson(request);
+    const q = String(body.query ?? url.searchParams.get("q") ?? "");
+    const topK = Number(body.limit ?? url.searchParams.get("limit") ?? 20);
+    if (rest[0] === "reindex") {
+      const n = await reindexPois(env as any, Number(body.limit) || 200);
+      return json({ indexed: n });
+    }
+    return json(await semanticSearch(q, env as any, topK));
+  }
+
   const session = await getSession(request, env);
   const actor = { userId: session.userId, isAdmin: session.isAdmin };
   const sessionCtx = { user: (session as any).user ?? null };
 
   /* -------------------------- enterprise modules -------------------------- */
+
   if (head === "v1") return handleV1Route(rest, request, env as any, await readJson(request));
   if (head === "openapi.json") return json(openApiDocument(url.origin));
   if (head === "orgs") return handleOrgRoute(rest, request, env, await readJson(request), sessionCtx);
