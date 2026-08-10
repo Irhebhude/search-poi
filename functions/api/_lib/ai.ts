@@ -84,17 +84,6 @@ export async function aiChat(opts: {
   const { env, messages, chain = "fast", stream = false, extraBody = {} } = opts;
   const chainProviders = providers(env, chain);
 
-  if (!chainProviders.length) {
-    return {
-      response: new Response(
-        JSON.stringify({ error: "No AI provider configured. Set GROQ_API_KEY, OPENROUTER_API_KEY or GEMINI_API_KEY." }),
-        { status: 503, headers: { "Content-Type": "application/json" } },
-      ),
-      model: "none",
-      attempts: 0,
-    };
-  }
-
   let attempts = 0;
   let last: Response | null = null;
 
@@ -122,12 +111,48 @@ export async function aiChat(opts: {
     }
   }
 
+  // Final fallback: Cloudflare Workers AI (no external key required).
+  if (env.AI) {
+    attempts++;
+    try {
+      const out = await env.AI.run(WORKERS_AI_MODEL, { messages });
+      const text: string = out?.response ?? out?.result?.response ?? "";
+      if (text) {
+        return { response: workersAiResponse(text, stream), model: `workers-ai/${WORKERS_AI_MODEL}`, attempts };
+      }
+    } catch {
+      /* fall through to the error below */
+    }
+  }
+
   return {
-    response: last || new Response(JSON.stringify({ error: "All AI models unavailable" }), { status: 503 }),
+    response:
+      last ||
+      new Response(
+        JSON.stringify({ error: "All AI providers unavailable. Configure GROQ_API_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY or the Workers AI binding." }),
+        { status: 503, headers: { "Content-Type": "application/json" } },
+      ),
     model: "none",
     attempts,
   };
 }
+
+/** Shape a Workers AI completion like an OpenAI chat response (or SSE stream). */
+function workersAiResponse(text: string, stream: boolean): Response {
+  if (!stream) {
+    return new Response(
+      JSON.stringify({ choices: [{ message: { role: "assistant", content: text }, finish_reason: "stop" }] }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+  const body =
+    `data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n` + "data: [DONE]\n\n";
+  return new Response(body, {
+    status: 200,
+    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+  });
+}
+
 
 /** Convenience: run a completion and return the plain text answer. */
 export async function aiText(opts: {
