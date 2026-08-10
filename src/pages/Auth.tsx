@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Mail, Lock, User, Eye, EyeOff, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { getRuntimeConfig } from "@/lib/runtime-config";
 import SEOHead from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,11 @@ const Auth = () => {
   const { signUp, signIn } = useAuth();
   const { toast } = useToast();
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    getRuntimeConfig().then((c) => setGoogleEnabled(c.google));
+  }, []);
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
@@ -23,6 +29,7 @@ const Auth = () => {
       setGoogleLoading(false);
     }
   };
+
 
   const referralCode = searchParams.get("ref") || "";
   const [isLogin, setIsLogin] = useState(!referralCode);
