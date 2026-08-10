@@ -281,7 +281,7 @@ export async function handleSupportRoute(
   }
 
   if (first === "upload" && method === "POST") {
-    if (!env.BUCKET) throw new HttpError(503, "File storage is not configured");
+    if (!env.BUCKET) throw new HttpError(501, "File uploads disabled");
     const form = await request.formData();
     const file = form.get("file") as File | null;
     if (!file) throw new HttpError(400, "No file supplied");
