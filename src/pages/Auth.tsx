@@ -153,11 +153,16 @@ const Auth = () => {
           </div>
         )}
 
-        {/* Google sign-in */}
+        {/* Google sign-in — hidden when the Worker has no Google credentials */}
+        {googleEnabled === false ? (
+          <div className="w-full text-center py-2.5 rounded-xl bg-secondary/40 border border-border/40 text-xs text-muted-foreground mb-4">
+            Auth not configured — Google sign-in unavailable
+          </div>
+        ) : (
         <button
           type="button"
           onClick={handleGoogle}
-          disabled={googleLoading}
+          disabled={googleLoading || googleEnabled === null}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-secondary/60 border border-border/40 text-foreground font-medium hover:bg-secondary transition-colors disabled:opacity-50 mb-4"
         >
           <svg className="w-4 h-4" viewBox="0 0 48 48" aria-hidden="true">
@@ -168,6 +173,8 @@ const Auth = () => {
           </svg>
           {googleLoading ? "Connecting..." : `Continue with Google`}
         </button>
+        )}
+
 
         <div className="flex items-center gap-3 mb-4">
           <div className="h-px flex-1 bg-border/40" />
