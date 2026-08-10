@@ -10,8 +10,14 @@ export interface AiEnv {
   GROQ_API_KEY?: string;
   OPENROUTER_API_KEY?: string;
   GEMINI_API_KEY?: string;
+  /** Workers AI binding — final fallback when every hosted provider fails. */
+  AI?: { run: (model: string, input: unknown) => Promise<any> };
   [key: string]: unknown;
 }
+
+/** Workers AI text model used as the last resort in the fallback chain. */
+export const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+
 
 interface Provider {
   name: string;
