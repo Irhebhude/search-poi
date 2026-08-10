@@ -15,4 +15,23 @@ database_id = "e5ebcc35-2261-4a93-8949-879e6a07612c"
 [ai]
 binding = "AI"
 
-# R2 REMOVED
+# ---------------------------------------------------------------------------
+# R2 (file storage) — KEPT FOR FUTURE USE.
+#
+# Deploys fail with "R2 bucket 'search-poi-files' not found" while the bucket
+# does not exist, so the binding stays commented until it is created:
+#
+#   npx wrangler r2 bucket create search-poi-files
+#
+# Then uncomment the three lines below and redeploy. Every `env.BUCKET` use in
+# the Worker is guarded, so the app deploys and runs fine without it.
+#
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "search-poi-files"
+# ---------------------------------------------------------------------------
+
+# Runtime variables live in Cloudflare Pages → Settings → Environment variables
+# (Production): VITE_API_BASE_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+# AUTH_SECRET, ADMIN_EMAILS, GROQ_API_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY,
+# AYRSHARE_API_KEY, NASA_API_KEY. Secrets are never committed here.
