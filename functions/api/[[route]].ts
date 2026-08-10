@@ -17,6 +17,7 @@ import { handleSupportRoute } from "./_lib/support";
 import { handleV1Route, openApiDocument } from "./_lib/devplatform";
 import { HttpError } from "./_lib/util";
 import { runRpc } from "./_lib/rpc";
+import { reindexPois, semanticSearch } from "./_lib/semantic";
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
   generateTrendingContent, imageSearch, json, newsSearch, poiApi, poiLive, poiLiveSearch,
@@ -271,7 +272,7 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   /* ------------------------------- storage -------------------------------- */
   if (head === "storage") {
     const [bucket, op, ...pathParts] = rest;
-    if (!env.BUCKET) return json({ error: "R2 bucket binding is not configured" }, 503);
+    if (!env.BUCKET) return json({ error: "File uploads disabled" }, 501);
 
     if (op === "upload") {
       if (!actor.isAdmin) return json({ error: "Forbidden: admin only" }, 403);
