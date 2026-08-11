@@ -182,6 +182,13 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     });
   }
 
+  /* -------------------- diagnostics + public POI REST API ------------------ */
+  if (head === "health") return healthRoute(env as any);
+  if (head === "debug") return debugRoute(env as any);
+  if (head === "pois") return poisRoute(rest, request, env as any, url, await readJson(request));
+
+
+
   /* --------------------- D1 + Workers AI semantic search ------------------- */
   if (head === "semantic-search") {
     const body = await readJson(request);
