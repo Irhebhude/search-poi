@@ -18,6 +18,7 @@ import { handleV1Route, openApiDocument } from "./_lib/devplatform";
 import { HttpError } from "./_lib/util";
 import { runRpc } from "./_lib/rpc";
 import { reindexPois, semanticSearch } from "./_lib/semantic";
+import { debugRoute, healthRoute, poisRoute, ticketsRoute } from "./_lib/poi";
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
   generateTrendingContent, imageSearch, json, newsSearch, poiApi, poiLive, poiLiveSearch,
@@ -206,6 +207,13 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   const sessionCtx = { user: (session as any).user ?? null };
 
   /* -------------------------- enterprise modules -------------------------- */
+
+  if (head === "tickets") {
+    return ticketsRoute(rest, request, env as any, url, await readJson(request), {
+      ...actor,
+      email: (session as any).user?.email ?? null,
+    });
+  }
 
   if (head === "v1") return handleV1Route(rest, request, env as any, await readJson(request));
   if (head === "openapi.json") return json(openApiDocument(url.origin));
