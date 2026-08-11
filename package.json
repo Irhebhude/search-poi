@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "db:migrate": "wrangler d1 migrations apply search-poi-db --remote",
     "db:migrate:local": "wrangler d1 migrations apply search-poi-db --local",
-    "cf:deploy": "vite build && wrangler pages deploy dist"
+    "cf:deploy": "vite build && wrangler pages deploy dist",
+    "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -52,6 +53,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.34.0",
     "input-otp": "^1.4.2",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
@@ -73,6 +75,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",

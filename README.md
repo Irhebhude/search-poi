@@ -48,3 +48,37 @@ auto timezone detection — no hardcoded dates. On Cloudflare, sync it against
 This code contains zero proprietary platform dependencies in the export layer.
 Buyer owns 100% of the code. ICS + Truth Engine live data requires a separate
 monthly data license.
+
+## Quick start (zero local wrangler)
+
+1. Push to GitHub and connect the repo to Cloudflare Pages (build `npm run build`, output `dist`).
+2. Cloudflare Dashboard → **D1** → Create database named `search-poi-db`.
+3. Pages → your project → **Settings → Bindings** → add D1 binding `DB` → **Retry deployment**.
+   (Optional: KV namespace `CACHE`, Workers AI binding `AI`.)
+4. Test: https://search-poi.pages.dev/api/health and https://search-poi.pages.dev/api/debug
+
+The `pois` table is created and auto-seeded on first request, so no migration run is required.
+
+### In-app diagnostics & tools
+
+| Route | Purpose |
+|---|---|
+| `/status` | System Status widget (Workers AI, D1, KV, config) + DB debug + **Reindex POIs** |
+| `/support` | Submit a ticket and track its status |
+| `/admin/support` | Admin queue: reply, close, reopen tickets |
+| `/explore` | Search / Add POI tabs with Leaflet map and "Use my location" |
+
+### API
+
+| Route | Purpose |
+|---|---|
+| `GET /api/health` | Binding + AI/D1/KV/config health |
+| `GET /api/debug` | `binding_found`, `table_exists`, `row_count`, `env_keys` |
+| `GET /api/pois?q=` | Search POIs by name/description |
+| `GET /api/pois/near?lat=&lon=&radius=5` | Haversine radius search (km) |
+| `POST /api/pois` | Create a POI (`name`, `latitude`, `longitude` required) |
+| `GET/POST/PATCH /api/tickets` | Support tickets (PATCH is admin-only) |
+| `POST /api/semantic-search/reindex` | Backfill Workers AI embeddings |
+
+Every route returns `{ error, details, help }` on failure, where `help` names the exact
+Cloudflare screen to open.
