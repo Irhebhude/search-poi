@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "db:migrate": "wrangler d1 migrations apply search-poi-db --remote",
     "db:migrate:local": "wrangler d1 migrations apply search-poi-db --local",
-    "cf:deploy": "vite build && wrangler pages deploy dist"
+    "cf:deploy": "vite build && wrangler pages deploy dist",
+    "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

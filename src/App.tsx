@@ -32,6 +32,10 @@ import Insights from "./pages/Insights";
 import DealRoom from "./pages/DealRoom";
 import DealRoomAdmin from "./pages/DealRoomAdmin";
 import EngineLanding from "./pages/EngineLanding";
+import Status from "./pages/Status";
+import Support from "./pages/Support";
+import SupportAdmin from "./pages/SupportAdmin";
+import Explore from "./pages/Explore";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +66,10 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/engine" element={<EngineLanding />} />
+            <Route path="/status" element={<Status />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/admin/support" element={<SupportAdmin />} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/dealroom" element={<DealRoom />} />
             <Route path="/dealroom/admin" element={<DealRoomAdmin />} />
             <Route path="/trending/:slug" element={<TrendingContent />} />

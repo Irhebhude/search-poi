@@ -1,0 +1,3 @@
+# Local development variables for `wrangler pages dev`.
+# Copy to .dev.vars and fill in. Never commit .dev.vars.
+CLOUDFLARE_D1_TOKEN=
