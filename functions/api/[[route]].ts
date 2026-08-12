@@ -188,6 +188,12 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   if (head === "debug") return debugRoute(env as any);
   if (head === "pois") return poisRoute(rest, request, env as any, url, await readJson(request));
 
+  /* ------------------ fact-based public search API (D1 only) --------------- */
+  if (head === "search") return factSearchRoute(request, env as any, url);
+  if (head === "index") return indexDocumentRoute(request, env as any, url, await readJson(request));
+
+
+
 
 
   /* --------------------- D1 + Workers AI semantic search ------------------- */
