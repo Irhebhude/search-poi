@@ -279,10 +279,11 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     return json({ error: "Unsupported method" }, 405);
   }
 
-  if (head === "search") {
+  if (head === "live-search") {
     const q = url.searchParams.get("q") || "";
     return poiLiveSearch({ query: q, limit: Number(url.searchParams.get("limit")) || 50 }, env);
   }
+
 
   /* ------------------------------- storage -------------------------------- */
   if (head === "storage") {
