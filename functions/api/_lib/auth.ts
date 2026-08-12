@@ -49,7 +49,7 @@ function randomToken(bytes = 32): string {
 
 export async function hashPassword(password: string, saltHex?: string): Promise<string> {
   const salt = saltHex
-   ? Uint8Array.from(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
+  ? Uint8Array.from(saltHex.match(/.{2}/g)!.map((b) => parseInt(b, 16)))
     : crypto.getRandomValues(new Uint8Array(16));
   const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
@@ -136,8 +136,8 @@ export async function createUser(
 
 export async function getUserByEmail(env: Env, email: string) {
   return env.DB.prepare(`SELECT * FROM users WHERE email =?`)
-   .bind(email.toLowerCase().trim())
-   .first<Record<string, any>>();
+  .bind(email.toLowerCase().trim())
+  .first<Record<string, any>>();
 }
 
 export async function getUserById(env: Env, id: string) {
@@ -249,7 +249,7 @@ export async function googleCallback(request: Request, env: Env) {
       code,
       client_id: env.GOOGLE_CLIENT_ID || "",
       client_secret: env.GOOGLE_CLIENT_SECRET || "",
-      redirect_uri: `${url.origin}/api/auth/callback/google`,
+      redirect_uri: `${origin}/api/auth/callback/google`,
       grant_type: "authorization_code",
     }),
   });
