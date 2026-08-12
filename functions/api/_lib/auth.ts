@@ -24,6 +24,8 @@ const SESSION_DAYS = 30;
 export interface Env {
   DB: D1Database;
   CACHE?: KVNamespace;
+  /** KV namespace holding public API keys for the SEARCH-POI v1 public API. */
+  API_KEYS?: KVNamespace;
   BUCKET?: R2Bucket;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;

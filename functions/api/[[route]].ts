@@ -20,6 +20,7 @@ import { runRpc } from "./_lib/rpc";
 import { reindexPois, semanticSearch } from "./_lib/semantic";
 import { debugRoute, healthRoute, poisRoute, ticketsRoute } from "./_lib/poi";
 import { factSearchRoute, indexDocumentRoute } from "./_lib/searchdb"; // removed keysRoute
+import { generateKeyRoute, revokeKeyRoute, requireApiKey } from "./_lib/keys";
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
   generateTrendingContent, imageSearch, json, newsSearch, poiApi, poiLive, poiLiveSearch,
@@ -187,9 +188,26 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   if (head === "debug") return debugRoute(env as any);
   if (head === "pois") return poisRoute(rest, request, env as any, url, await readJson(request));
 
+  /* ----------------------- public API key endpoints ----------------------- */
+  if (head === "generate-key" && request.method === "POST") {
+    return generateKeyRoute(request, env);
+  }
+  if (head === "revoke-key" && request.method === "POST") {
+    return revokeKeyRoute(request, env);
+  }
+
   /* ------------------ fact-based public search API (D1 only) --------------- */
-  if (head === "search") return factSearchRoute(request, env as any, url);
-  if (head === "index") return indexDocumentRoute(request, env as any, url, await readJson(request));
+  // /api/search is protected by the KV-backed API-key auth (x-api-key header or ?api_key=).
+  if (head === "search") {
+    const authErr = await requireApiKey(request, env, url);
+    if (authErr) return authErr;
+    return factSearchRoute(request, env as any, url);
+  }
+  if (head === "index") {
+    const authErr = await requireApiKey(request, env, url);
+    if (authErr) return authErr;
+    return indexDocumentRoute(request, env as any, url, await readJson(request));
+  }
 
   /* --------------------- D1 + Workers AI semantic search ------------------- */
   if (head === "semantic-search") {
@@ -369,198 +387,6 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
       }
       const doc = await env.DB.prepare(`SELECT * FROM deal_documents WHERE id =?`)
       .bind(req.document_id).first<Record<string, any>>();
-      if (!doc) return json({ error: "Document not found" }, 404);
-      const object = await env.BUCKET.get(`${bucket}/${doc.file_path}`);
-      if (!object) return json({ error: "File not found" }, 404);
-      return new Response(object.body, {
-        headers: {
-          "Content-Type": doc.mime_type || "application/octet-stream",
-          "Content-Disposition": `attachment; filename="${doc.file_name}"`,
-        },
-      });
-    }
-
-    if (op === "object") {
-      if (!actor.isAdmin) return json({ error: "Forbidden" }, 403);
-      const object = await env.BUCKET.get(`${bucket}/${pathParts.join("/")}`);
-      if (!object) return json({ error: "Not found" }, 404);
-      return new Response(object.body, {
-        headers: { "Content-Type": object.httpMetadata?.contentType || "application/octet-stream" },
-      });
-    }
-
-    return json({ error: "Unknown storage operation" }, 404);
-  }
-
-  /* ------------------------------ functions ------------------------------- */
-  if (head === "poi-api") {
-    return poiApi(request, await readJson(request), env);
-  }
-
-  if (head === "poi-live") {
-    return poiLive(rest[0] || "", request, env);
-  }
-
-  if (head === "fn") {
-    const name = rest[0];
-    const body = await readJson(request);
-    switch (name) {
-      case "search-ai": return searchAi(body, env);
-      case "web-search": return webSearch(body);
-      case "news-search": return newsSearch(body);
-      case "image-search": return imageSearch(body);
-      case "video-search": return videoSearch(body);
-      case "summarize-url": return summarizeUrl(body, env);
-      case "poi-live-search": return poiLiveSearch(body, env);
-      case "generate-blueprint": return generateBlueprint(body, env);
-      case "generate-build-guide": return generateBuildGuide(body, env);
-      case "generate-trending-content": return generateTrendingContent(env);
-      case "feedback-ai": return feedbackAi(body, env);
-      case "ayrshare-post": return ayrsharePost(body, env);
-      case "deal-room-approve": return dealRoomApprove(body, env, actor, url.origin);
-      case "poi-api": return poiApi(request, body, env);
-      default: return json({ error: `Unknown function: ${name}` }, 404);
-    }
-  }
-
-  return json({ error: "Not found" }, 404);
-}
-
-/** Scheduled trigger: refresh programmatic SEO content. */
-export const onSchedule = async (env: Env) => generateTrendingContent(env);/api/keys/generate
-    if (request.method === "POST" && rest[0] === "generate") {
-      const rawKey = `poi_${randomToken(24)}`;
-      const keyHash = await hashPassword(rawKey);
-      const now = new Date().toISOString();
-
-      // Deactivate old keys
-      await env.DB.prepare(`UPDATE api_keys SET is_active = 0 WHERE user_id =?`).bind(session.userId).run();
-
-      // Insert new key
-      const id = crypto.randomUUID();
-      await env.DB.prepare(
-        `INSERT INTO api_keys (id, user_id, name, key_hash, created_at, is_active)
-         VALUES (?,?,?,?,?, 1)`
-      ).bind(id, session.userId, "Default", keyHash, now).run();
-
-      return json({ id, key: rawKey, created_at: now, is_active: 1, requests_count: 0 });
-    }
-
-    return json({ error: "Not found" }, 404);
-  }
-
-  if (head === "tickets") {
-    return ticketsRoute(rest, request, env as any, url, await readJson(request), {
-     ...actor,
-      email: (session as any).user?.email?? null,
-    });
-  }
-
-  if (head === "v1") return handleV1Route(rest, request, env as any, await readJson(request));
-  if (head === "openapi.json") return json(openApiDocument(url.origin));
-  if (head === "orgs") return handleOrgRoute(rest, request, env, await readJson(request), sessionCtx);
-  if (head === "rag") return handleRagRoute(rest, request, env as any, await readJson(request), sessionCtx);
-  if (head === "support") {
-    const isUpload = rest[0] === "upload";
-    return handleSupportRoute(rest, request, env, isUpload? {} : await readJson(request), sessionCtx);
-  }
-  if (head === "events" || head === "analytics") {
-    const segs = head === "events"? ["events",...rest] : rest;
-    return handleAnalyticsRoute(segs, request, env, await readJson(request), sessionCtx);
-  }
-
-  /* -------------------------------- data --------------------------------- */
-  if (head === "db") {
-    const [table, action] = rest;
-    if (!table ||!action) return json({ error: "table and action required" }, 400);
-    const body = await readJson(request);
-    const data = await runTableQuery(env.DB, table, action as any, body, actor);
-    return json({ data });
-  }
-
-  if (head === "rpc") {
-    const data = await runRpc(rest.join("/"), await readJson(request), env, actor);
-    return json({ data });
-  }
-
-  /* --------------------------- places REST API --------------------------- */
-  if (head === "places" || head === "place") {
-    const id = head === "place"? rest[0] : rest[0];
-    const body = await readJson(request);
-
-    if (request.method === "GET" && head === "place" && id) {
-      const data = await runTableQuery(env.DB, "businesses", "select",
-        { filters: [{ column: "id", op: "eq", value: id }], rowMode: "single" }, actor);
-      return json({ data });
-    }
-    if (request.method === "GET") {
-      const filters = [] as any[];
-      const city = url.searchParams.get("city");
-      const category = url.searchParams.get("category");
-      if (city) filters.push({ column: "city", op: "eq", value: city });
-      if (category) filters.push({ column: "category", op: "eq", value: category });
-      const data = await runTableQuery(env.DB, "businesses", "select",
-        { filters, order: { column: "created_at", ascending: false }, limit: Number(url.searchParams.get("limit")) || 50 }, actor);
-      return json({ data });
-    }
-    if (request.method === "POST") {
-      const data = await runTableQuery(env.DB, "businesses", "insert", { values: body }, actor);
-      return json({ data });
-    }
-    if (request.method === "PUT" && id) {
-      const data = await runTableQuery(env.DB, "businesses", "update",
-        { values: body, filters: [{ column: "id", op: "eq", value: id }] }, actor);
-      return json({ data });
-    }
-    if (request.method === "DELETE" && id) {
-      await runTableQuery(env.DB, "businesses", "delete",
-        { filters: [{ column: "id", op: "eq", value: id }] }, actor);
-      return json({ data: { deleted: id } });
-    }
-    return json({ error: "Unsupported method" }, 405);
-  }
-
-  if (head === "live-search") {
-    const q = url.searchParams.get("q") || "";
-    return poiLiveSearch({ query: q, limit: Number(url.searchParams.get("limit")) || 50 }, env);
-  }
-
-  /* ------------------------------- storage -------------------------------- */
-  if (head === "storage") {
-    const [bucket, op,...pathParts] = rest;
-    if (!env.BUCKET) return json({ error: "File uploads disabled" }, 501);
-
-    if (op === "upload") {
-      if (!actor.isAdmin) return json({ error: "Forbidden: admin only" }, 403);
-      const form = await request.formData();
-      const file = form.get("file") as unknown as File | null;
-      const path = String(form.get("path") || "");
-      if (!file ||!path) return json({ error: "file and path are required" }, 400);
-      const key = `${bucket}/${path}`;
-      await env.BUCKET.put(key, await file.arrayBuffer(), {
-        httpMetadata: { contentType: (file as any).type || "application/octet-stream" },
-      });
-      return json({ path, key, size: (file as any).size?? null });
-    }
-
-    if (op === "remove") {
-      if (!actor.isAdmin) return json({ error: "Forbidden: admin only" }, 403);
-      const { paths } = await readJson(request);
-      for (const p of paths || []) await env.BUCKET.delete(`${bucket}/${p}`);
-      return json({ ok: true });
-    }
-
-    if (op === "download") {
-      const token = url.searchParams.get("token");
-      if (!token) return json({ error: "token required" }, 400);
-      const req = await env.DB.prepare(
-        `SELECT * FROM deal_access_requests WHERE download_token =? AND status = 'approved'`,
-      ).bind(token).first<Record<string, any>>();
-      if (!req || new Date(req.token_expires_at).getTime() < Date.now()) {
-        return json({ error: "This download link is invalid or has expired" }, 403);
-      }
-      const doc = await env.DB.prepare(`SELECT * FROM deal_documents WHERE id =?`)
-       .bind(req.document_id).first<Record<string, any>>();
       if (!doc) return json({ error: "Document not found" }, 404);
       const object = await env.BUCKET.get(`${bucket}/${doc.file_path}`);
       if (!object) return json({ error: "File not found" }, 404);

@@ -7,6 +7,14 @@ binding = "CACHE"
 id = "61083725182743da80514caf59a03481"
 preview_id = "63df4961030744308bb5a05639e2f6df"
 
+# Public API keys for the SEARCH-POI v1 public API (/api/generate-key, /api/revoke-key).
+# Create it once with:
+#   npx wrangler kv namespace create API_KEYS
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
+preview_id = "0f9e8d7c6b5a4928170605c4d3b2a1f0"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "search-poi-db"
