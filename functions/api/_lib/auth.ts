@@ -105,10 +105,10 @@ export async function createUser(
   const now = new Date().toISOString();
   const email = data.email.toLowerCase().trim();
 
-  // FIXED: 7 columns = 7 placeholders
+  // 7 columns = 7?
   await env.DB.prepare(
     `INSERT INTO users (id, email, name, picture, password_hash, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?)` // <-- 7 QUESTION MARKS
+     VALUES (?,?,?,?,?,?,?)`
   ).bind(
     id,
     email,
@@ -119,9 +119,10 @@ export async function createUser(
     now
   ).run();
 
+  // FIXED: 10 columns = 10 values. 3? + 4 nums + 2? = 10
   await env.DB.prepare(
     `INSERT INTO profiles (id, display_name, referral_code, email_verified, search_count, is_premium, poi_points, lite_mode, created_at, updated_at)
-     VALUES (?,?,?,?, 1, 0, 0, 0, 0,?,?)`
+     VALUES (?,?,?, 1, 0, 0, 0, 0,?,?)`
   ).bind(id, data.name?? email.split("@")[0], referralCode(), now, now).run();
 
   const admins = (env.ADMIN_EMAILS || "").toLowerCase().split(",").map((e) => e.trim()).filter(Boolean);
