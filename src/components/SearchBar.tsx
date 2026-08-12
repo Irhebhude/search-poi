@@ -40,7 +40,7 @@ const SearchBar = ({ onSearch, isLoading, compact, initialQuery = "" }: SearchBa
         <div
           className={`search-glow relative flex items-center gap-3 glass rounded-2xl transition-all duration-300 ${
             compact ? "px-4 py-3" : "px-6 py-4"
-          } ${isFocused ? "glow-border" : ""}`}
+          } ${isFocused ? "glow-border !border-[#00F0FF]" : ""}`}
         >
           <Search className="w-5 h-5 text-primary shrink-0" />
           <VoiceSearchButton onTranscript={(text) => { setQuery(text); onSearch(text); }} />
@@ -61,8 +61,8 @@ const SearchBar = ({ onSearch, isLoading, compact, initialQuery = "" }: SearchBa
               setTimeout(() => setShowSuggestions(false), 200);
             }}
             placeholder="Ask anything... SEARCH-POI understands you"
-            className={`flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground font-sans ${
-              compact ? "text-base" : "text-lg"
+            className={`flex-1 bg-[#1A1A24] outline-none text-foreground placeholder:text-muted-foreground font-sans rounded-xl ${
+              compact ? "text-base px-3 py-2" : "text-lg px-3 py-2"
             }`}
           />
           {isLoading ? (

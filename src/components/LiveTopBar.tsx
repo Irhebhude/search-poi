@@ -1,4 +1,4 @@
-import { RefreshCw, Satellite, Wifi, WifiOff, AlertTriangle } from "lucide-react";
+import { RefreshCw, Satellite, WifiOff, AlertTriangle } from "lucide-react";
 import { PoiLiveState } from "@/hooks/usePoiLive";
 
 interface Props {
@@ -12,7 +12,7 @@ const LiveTopBar = ({ live }: Props) => {
       <div className="container mx-auto flex flex-wrap items-center justify-between gap-2 px-4 py-1.5 text-[11px]">
         <div className="flex items-center gap-2 font-medium">
           {live.online ? (
-            <Wifi className="w-3.5 h-3.5 text-primary" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#00FF88] shadow-[0_0_6px_#00FF88]" aria-hidden />
           ) : (
             <WifiOff className="w-3.5 h-3.5 text-destructive" />
           )}
@@ -22,7 +22,7 @@ const LiveTopBar = ({ live }: Props) => {
 
         <button
           onClick={live.syncNow}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium min-h-[28px]"
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors font-medium min-h-[28px]"
         >
           <RefreshCw className="w-3 h-3" />
           Sync Now

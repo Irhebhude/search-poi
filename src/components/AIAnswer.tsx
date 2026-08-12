@@ -93,7 +93,7 @@ const AIAnswer = ({ answer, isStreaming, query, sources = [], liteMode }: AIAnsw
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-foreground text-sm">SEARCH-POI ENGINE v1</h3>
-            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary uppercase tracking-wider">
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#00F0FF] text-black uppercase tracking-wider">
               Intelligent Reasoning
             </span>
           </div>
@@ -213,7 +213,7 @@ const AIAnswer = ({ answer, isStreaming, query, sources = [], liteMode }: AIAnsw
             Powered by <span className="text-primary font-semibold">SEARCH-POI Engine v1</span> • {sources.length} sources verified
           </span>
           <span className="text-[10px] text-muted-foreground">
-            Confidence: <span className={`font-bold ${confidence >= 80 ? "text-[hsl(142,70%,50%)]" : "text-yellow-400"}`}>{confidence}%</span>
+            Confidence: <span className="font-bold text-[#00F0FF]">{confidence}%</span>
           </span>
         </div>
       )}

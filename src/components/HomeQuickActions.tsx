@@ -6,10 +6,10 @@ interface Props {
 }
 
 const ACTIONS = [
-  { label: "POS Cash", icon: Banknote, query: "POS cash points near me", accent: "hsl(45,90%,55%)" },
-  { label: "Fuel Price", icon: Fuel, query: "fuel price petrol stations near me", accent: "hsl(150,70%,55%)" },
-  { label: "Traffic", icon: TrafficCone, query: "live traffic conditions near me", accent: "hsl(25,90%,58%)" },
-  { label: "Danger", icon: ShieldAlert, query: "safety alerts and danger zones near me", accent: "hsl(0,80%,62%)" },
+  { label: "POS Cash", icon: Banknote, query: "POS cash points near me", accent: "#FFD700" },
+  { label: "Fuel Price", icon: Fuel, query: "fuel price petrol stations near me", accent: "#00FF88" },
+  { label: "Traffic", icon: TrafficCone, query: "live traffic conditions near me", accent: "#FFA500" },
+  { label: "Danger", icon: ShieldAlert, query: "safety alerts and danger zones near me", accent: "#FF3B30" },
 ];
 
 /** 2x2 quick actions grid + Near me button, matching v1 home layout. */

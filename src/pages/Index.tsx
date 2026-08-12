@@ -23,7 +23,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#05070A] text-white">
+    <div className="min-h-screen bg-[#0A0A0F] text-white">
       <Header />
       <LiveTopBar live={live} />
       <FloatingMenu onNearMe={() => setShowLocationSearch(true)} />
@@ -32,44 +32,44 @@ const Index = () => {
         <div className="container mx-auto max-w-4xl">
           {/* HERO */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-3">
-              <span className="text-white">SEARCH</span><span className="text-cyan-400">-POI</span>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-3 gradient-text">
+              SEARCH-POI
             </h1>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-400 font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 text-xs text-primary font-bold mb-4">
               <Zap className="w-3 h-3" /> POWERED BY SEARCH-POI ENGINE V1
             </div>
-            <p className="text-2xl md:text-3xl font-semibold">Don't search. <span className="text-cyan-400">Ask.</span></p>
+            <p className="text-2xl md:text-3xl font-semibold">Don't search. <span className="text-[#00F0FF]">Ask.</span></p>
 
             {/* SEARCH BAR */}
             <div className="relative mt-8 max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-              <Mic className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary z-10" />
+              <Mic className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary z-10" />
               <SearchBar onSearch={handleSearch} />
             </div>
 
-            {/* 4 CARDS */}
+            {/* 4 CARDS — glassmorphism with exact v1 icon colors */}
             <div className="grid grid-cols-2 gap-3 mt-8">
-              {[{icon: Wallet, label: "POS Cash", color: "text-yellow-400"}, {icon: Fuel, label: "Fuel Price", color: "text-green-400"}, {icon: TrafficCone, label: "Traffic", color: "text-orange-400"}, {icon: Shield, label: "Danger", color: "text-red-400"}].map(({icon: Icon, label, color}) => (
-                <button key={label} className="flex items-center gap-3 p-4 rounded-2xl bg-[#0A0E14] border border-[#1A1F2E] hover:border-cyan-500/50">
-                  <Icon className={`w-6 h-6 ${color}`} /> <span className="font-medium">{label}</span>
+              {[{icon: Wallet, label: "POS Cash", color: "#FFD700"}, {icon: Fuel, label: "Fuel Price", color: "#00FF88"}, {icon: TrafficCone, label: "Traffic", color: "#FFA500"}, {icon: Shield, label: "Danger", color: "#FF3B30"}].map(({icon: Icon, label, color}) => (
+                <button key={label} className="glass flex items-center gap-3 p-4 rounded-2xl hover:border-primary/50 transition-colors">
+                  <Icon className="w-6 h-6" style={{ color }} /> <span className="font-medium">{label}</span>
                 </button>
               ))}
             </div>
 
-            <button onClick={() => setShowLocationSearch(true)} className="w-full h-14 mt-4 rounded-2xl bg-cyan-500 text-black font-bold flex items-center justify-center gap-2">
+            <button onClick={() => setShowLocationSearch(true)} className="w-full h-14 mt-4 rounded-2xl bg-[#00F0FF] text-black font-bold flex items-center justify-center gap-2 hover:bg-[#00D4FF] transition-colors">
               <MapPin /> Near me
             </button>
           </motion.div>
 
           {/* FINTECH + SPACE CARDS */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mb-8">
-            <div className="p-4 rounded-2xl bg-[#0A0E14] border border-[#1A1F2E] mb-4">
-              <div className="flex items-center gap-2 mb-3"><BarChart3 className="w-5 h-5 text-cyan-400" /><h3 className="font-bold">Fintech Intelligence</h3></div>
+            <div className="glass p-4 rounded-2xl mb-4">
+              <div className="flex items-center gap-2 mb-3"><BarChart3 className="w-5 h-5 text-primary" /><h3 className="font-bold">Fintech Intelligence</h3></div>
               <FintechDashboard />
             </div>
-            <div className="p-4 rounded-2xl bg-[#0A0E14] border-[#1A1F2E]">
-              <div className="flex items-center gap-2 mb-3"><Rocket className="w-5 h-5 text-cyan-400" /><h3 className="font-bold">Space Intelligence</h3></div>
-              <p className="text-sm text-gray-400">Checking space conditions...</p>
+            <div className="glass p-4 rounded-2xl">
+              <div className="flex items-center gap-2 mb-3"><Rocket className="w-5 h-5 text-primary" /><h3 className="font-bold">Space Intelligence</h3></div>
+              <p className="text-sm text-muted-foreground">Checking space conditions...</p>
             </div>
           </motion.div>
 
