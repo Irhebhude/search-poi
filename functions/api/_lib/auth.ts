@@ -104,20 +104,30 @@ export async function createUser(
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   const email = data.email.toLowerCase().trim();
+
+  // FIXED: 7 columns = 7 placeholders
   await env.DB.prepare(
     `INSERT INTO users (id, email, name, picture, password_hash, created_at, updated_at)
-     VALUES (?,?,?)`,
-  ).bind(id, email, data.name?? email.split("@")[0], data.picture?? null, data.passwordHash?? null, now, now).run();
+     VALUES (?,?,?,?,?,?)`
+  ).bind(
+    id,
+    email,
+    data.name?? email.split("@")[0],
+    data.picture?? null,
+    data.passwordHash?? null,
+    now,
+    now
+  ).run();
 
   await env.DB.prepare(
     `INSERT INTO profiles (id, display_name, referral_code, email_verified, search_count, is_premium, poi_points, lite_mode, created_at, updated_at)
-     VALUES (?,?,?, 1, 0, 0, 0, 0,?,?)`,
+     VALUES (?,?,?,?, 1, 0, 0, 0, 0,?,?)`
   ).bind(id, data.name?? email.split("@")[0], referralCode(), now, now).run();
 
   const admins = (env.ADMIN_EMAILS || "").toLowerCase().split(",").map((e) => e.trim()).filter(Boolean);
   if (admins.includes(email)) {
     await env.DB.prepare(
-      `INSERT OR IGNORE INTO user_roles (id, user_id, role, created_at) VALUES (?,?, 'admin',?)`,
+      `INSERT OR IGNORE INTO user_roles (id, user_id, role, created_at) VALUES (?,?, 'admin',?)`
     ).bind(crypto.randomUUID(), id, now).run();
   }
 
@@ -261,7 +271,7 @@ export async function googleCallback(request: Request, env: Env) {
 
   await env.DB.prepare(
     `INSERT OR IGNORE INTO accounts (id, user_id, provider, provider_account_id, created_at)
-     VALUES (?,?, 'google',?,?)`,
+     VALUES (?,?, 'google',?,?)`
   ).bind(crypto.randomUUID(), user!.id, gp.sub, new Date().toISOString()).run();
 
   const { token } = await createSession(env, user!.id);
