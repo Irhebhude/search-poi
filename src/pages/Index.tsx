@@ -142,6 +142,9 @@ const Index = () => {
             <p className="text-xl sm:text-2xl md:text-3xl text-foreground font-semibold max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
               Don't search. <span className="gradient-text">Ask.</span>
             </p>
+            <p className="-mt-4 sm:-mt-7 mb-6 sm:mb-10 text-sm text-muted-foreground">
+              Fact-based answers. No hallucination.
+            </p>
 
 
             <SearchBar onSearch={handleSearch} />
