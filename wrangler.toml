@@ -8,12 +8,11 @@ id = "61083725182743da80514caf59a03481"
 preview_id = "63df4961030744308bb5a05639e2f6df"
 
 # Public API keys for the SEARCH-POI v1 public API (/api/generate-key, /api/revoke-key).
-# Create it once with:
-#   npx wrangler kv namespace create API_KEYS
+# Real IDs created in Cloudflare Dashboard
 [[kv_namespaces]]
 binding = "API_KEYS"
-id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
-preview_id = "0f9e8d7c6b5a4928170605c4d3b2a1f0"
+id = "0a3e003bf24c4df6b985a0b247a14aec"
+preview_id = "252b6b5b450f474a9d514791ee72f03b"
 
 [[d1_databases]]
 binding = "DB"
@@ -29,7 +28,7 @@ binding = "AI"
 # Deploys fail with "R2 bucket 'search-poi-files' not found" while the bucket
 # does not exist, so the binding stays commented until it is created:
 #
-#   npx wrangler r2 bucket create search-poi-files
+# npx wrangler r2 bucket create search-poi-files
 #
 # Then uncomment the three lines below and redeploy. Every `env.BUCKET` use in
 # the Worker is guarded, so the app deploys and runs fine without it.
