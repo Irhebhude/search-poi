@@ -15,6 +15,7 @@ import LiveActivityFeed from "@/components/LiveActivityFeed";
 import TrendingTopics from "@/components/TrendingTopics";
 import LocationSearch from "@/components/LocationSearch";
 import FintechDashboard from "@/components/FintechDashboard";
+import DeveloperSection from "@/components/DeveloperSection";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const FEATURES = [
@@ -141,6 +142,9 @@ const Index = () => {
             <p className="text-xl sm:text-2xl md:text-3xl text-foreground font-semibold max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
               Don't search. <span className="gradient-text">Ask.</span>
             </p>
+            <p className="-mt-4 sm:-mt-7 mb-6 sm:mb-10 text-sm text-muted-foreground">
+              Fact-based answers. No hallucination.
+            </p>
 
 
             <SearchBar onSearch={handleSearch} />
@@ -181,6 +185,16 @@ const Index = () => {
             className="mb-8 sm:mb-12"
           >
             <FintechDashboard />
+          </motion.div>
+
+          {/* For developers */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8 sm:mb-12"
+          >
+            <DeveloperSection />
           </motion.div>
 
           {/* Features grid */}
@@ -225,7 +239,7 @@ const Index = () => {
           >
             <p id="lastUpdate" className="mb-2 text-primary/90 font-medium tabular-nums">{live.lastUpdate}</p>
             <p>Founded by <span className="text-foreground">Prosper Ozoya Irhebhude</span> • POI Foundation</p>
-            <p className="mt-1">Powered by <span className="text-primary font-semibold">SEARCH-POI Engine v1</span> • Intelligent Reasoning • Privacy Focused</p>
+            <p className="mt-1">SEARCH-POI Engine v1 • Fact-Based Search • Public API</p>
             <p className="mt-2"><a href="/policies" className="text-primary hover:underline">Policies & Governance</a></p>
           </motion.div>
         </div>

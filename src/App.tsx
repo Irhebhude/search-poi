@@ -36,6 +36,7 @@ import Status from "./pages/Status";
 import Support from "./pages/Support";
 import SupportAdmin from "./pages/SupportAdmin";
 import Explore from "./pages/Explore";
+import ApiKeys from "./pages/ApiKeys";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,7 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/admin/support" element={<SupportAdmin />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/dashboard/api-keys" element={<ApiKeys />} />
             <Route path="/dealroom" element={<DealRoom />} />
             <Route path="/dealroom/admin" element={<DealRoomAdmin />} />
             <Route path="/trending/:slug" element={<TrendingContent />} />

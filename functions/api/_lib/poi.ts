@@ -8,6 +8,7 @@
 
 import type { Env } from "./auth";
 import { json } from "./util";
+import { documentsCount } from "./searchdb";
 
 export interface AnyEnv extends Env {
   DATABASE?: D1Database;
@@ -149,8 +150,10 @@ export async function healthRoute(env: AnyEnv): Promise<Response> {
     ].join(" · "),
   } as any;
 
+  const documents_count = await documentsCount(db);
+
   const status = Object.values(checks).every((c) => c.ok) ? "ok" : "degraded";
-  return json({ status, binding_used: binding, checks, checked_at: new Date().toISOString() });
+  return json({ status, binding_used: binding, documents_count, checks, checked_at: new Date().toISOString() });
 }
 
 export async function debugRoute(env: AnyEnv): Promise<Response> {
