@@ -15,6 +15,7 @@ import LiveActivityFeed from "@/components/LiveActivityFeed";
 import TrendingTopics from "@/components/TrendingTopics";
 import LocationSearch from "@/components/LocationSearch";
 import FintechDashboard from "@/components/FintechDashboard";
+import DeveloperSection from "@/components/DeveloperSection";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const FEATURES = [
@@ -183,6 +184,16 @@ const Index = () => {
             <FintechDashboard />
           </motion.div>
 
+          {/* For developers */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8 sm:mb-12"
+          >
+            <DeveloperSection />
+          </motion.div>
+
           {/* Features grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8">
             {FEATURES.map((feature, i) => (
@@ -225,7 +236,7 @@ const Index = () => {
           >
             <p id="lastUpdate" className="mb-2 text-primary/90 font-medium tabular-nums">{live.lastUpdate}</p>
             <p>Founded by <span className="text-foreground">Prosper Ozoya Irhebhude</span> • POI Foundation</p>
-            <p className="mt-1">Powered by <span className="text-primary font-semibold">SEARCH-POI Engine v1</span> • Intelligent Reasoning • Privacy Focused</p>
+            <p className="mt-1">SEARCH-POI Engine v1 • Fact-Based Search • Public API</p>
             <p className="mt-2"><a href="/policies" className="text-primary hover:underline">Policies & Governance</a></p>
           </motion.div>
         </div>
