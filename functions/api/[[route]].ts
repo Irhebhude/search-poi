@@ -19,7 +19,7 @@ import { HttpError } from "./_lib/util";
 import { runRpc } from "./_lib/rpc";
 import { reindexPois, semanticSearch } from "./_lib/semantic";
 import { debugRoute, healthRoute, poisRoute, ticketsRoute } from "./_lib/poi";
-import { factSearchRoute, indexDocumentRoute, keysRoute } from "./_lib/searchdb";
+import { factSearchRoute, indexDocumentRoute } from "./_lib/searchdb"; // removed keysRoute
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
   generateTrendingContent, imageSearch, json, newsSearch, poiApi, poiLive, poiLiveSearch,
@@ -52,16 +52,16 @@ export const onRequest = async (ctx: Ctx): Promise<Response> => {
 
   if (request.method === "OPTIONS") return new Response(null, { headers: cors(origin) });
 
-  const segments = (Array.isArray(ctx.params.route) ? ctx.params.route : [ctx.params.route || ""]).filter(Boolean);
-  const [head, ...rest] = segments;
+  const segments = (Array.isArray(ctx.params.route)? ctx.params.route : [ctx.params.route || ""]).filter(Boolean);
+  const [head,...rest] = segments;
 
   try {
     const res = await route(head, rest, request, env, url);
     return withCors(res, origin);
   } catch (e) {
     if (e instanceof HttpError) return withCors(json({ error: e.message }, e.status), origin);
-    const message = e instanceof Error ? e.message : "Unexpected error";
-    const status = /required|Forbidden|Unauthor/i.test(message) ? (/Forbidden/.test(message) ? 403 : 401) : 400;
+    const message = e instanceof Error? e.message : "Unexpected error";
+    const status = /required|Forbidden|Unauthor/i.test(message)? (/Forbidden/.test(message)? 403 : 401) : 400;
     return withCors(json({ error: message }, status), origin);
   }
 };
@@ -78,12 +78,12 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
 
     if (action === "get-session") {
       const s = await getSession(request, env);
-      return json({ session: s.user ? { user: s.user, expires_at: s.expiresAt } : null });
+      return json({ session: s.user? { user: s.user, expires_at: s.expiresAt } : null });
     }
 
     if (action === "sign-in/social") {
       const provider = url.searchParams.get("provider") || "google";
-      if (provider !== "google") return json({ error: "Unsupported provider" }, 400);
+      if (provider!== "google") return json({ error: "Unsupported provider" }, 400);
       return googleAuthorizeRedirect(request, env, url.searchParams.get("callbackURL") || "/");
     }
 
@@ -91,7 +91,7 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
 
     if (action === "sign-up/email") {
       const { email, password, name } = await readJson(request);
-      if (!email || !password || String(password).length < 6) {
+      if (!email ||!password || String(password).length < 6) {
         return json({ error: "Email and a password of at least 6 characters are required" }, 400);
       }
       if (await getUserByEmail(env, email)) return json({ error: "An account with this email already exists" }, 409);
@@ -107,7 +107,7 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     if (action === "sign-in/email") {
       const { email, password } = await readJson(request);
       const user = await getUserByEmail(env, email || "");
-      if (!user?.password_hash || !(await verifyPassword(password || "", user.password_hash))) {
+      if (!user?.password_hash ||!(await verifyPassword(password || "", user.password_hash))) {
         return json({ error: "Invalid email or password" }, 401);
       }
       const { token, expires } = await createSession(env, user.id);
@@ -126,14 +126,12 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     if (action === "request-password-reset") {
       const { email, redirectTo } = await readJson(request);
       const user = await getUserByEmail(env, email || "");
-      // Always answer 200 so the endpoint cannot be used to enumerate accounts.
       if (user) {
         const token = randomToken(32);
         await env.DB.prepare(
-          `INSERT INTO password_resets (token, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)`,
+          `INSERT INTO password_resets (token, user_id, expires_at, created_at) VALUES (?,?,?,?)`,
         ).bind(token, user.id, new Date(Date.now() + 3600_000).toISOString(), new Date().toISOString()).run();
         const link = `${redirectTo || `${url.origin}/reset-password`}?token=${token}`;
-        // No mail provider is configured; the link is returned for the caller to deliver.
         return json({ ok: true, resetUrl: link });
       }
       return json({ ok: true });
@@ -144,26 +142,26 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
       let userId: string | null = null;
 
       if (token) {
-        const row = await env.DB.prepare(`SELECT * FROM password_resets WHERE token = ?`)
-          .bind(token).first<Record<string, any>>();
+        const row = await env.DB.prepare(`SELECT * FROM password_resets WHERE token =?`)
+         .bind(token).first<Record<string, any>>();
         if (!row || new Date(row.expires_at).getTime() < Date.now()) {
           return json({ error: "Reset link is invalid or has expired" }, 400);
         }
         userId = row.user_id;
-        await env.DB.prepare(`DELETE FROM password_resets WHERE token = ?`).bind(token).run();
+        await env.DB.prepare(`DELETE FROM password_resets WHERE token =?`).bind(token).run();
       } else {
         userId = (await getSession(request, env)).userId;
       }
       if (!userId) return json({ error: "Authentication required" }, 401);
       if (!password || String(password).length < 6) return json({ error: "Password must be at least 6 characters" }, 400);
 
-      await env.DB.prepare(`UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?`)
-        .bind(await hashPassword(password), new Date().toISOString(), userId).run();
-      await env.DB.prepare(`DELETE FROM sessions WHERE user_id = ?`).bind(userId).run();
+      await env.DB.prepare(`UPDATE users SET password_hash =?, updated_at =? WHERE id =?`)
+       .bind(await hashPassword(password), new Date().toISOString(), userId).run();
+      await env.DB.prepare(`DELETE FROM sessions WHERE user_id =?`).bind(userId).run();
 
       const { token: sessionToken, expires } = await createSession(env, userId);
-      const user = await env.DB.prepare(`SELECT id, email, name, image, created_at FROM users WHERE id = ?`)
-        .bind(userId).first<Record<string, any>>();
+      const user = await env.DB.prepare(`SELECT id, email, name, image, created_at FROM users WHERE id =?`)
+       .bind(userId).first<Record<string, any>>();
       return json({ session: { user, expires_at: expires } }, 200, {
         "Set-Cookie": cookie(SESSION_COOKIE, sessionToken, 30 * 86400),
       });
@@ -193,15 +191,11 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   if (head === "search") return factSearchRoute(request, env as any, url);
   if (head === "index") return indexDocumentRoute(request, env as any, url, await readJson(request));
 
-
-
-
-
   /* --------------------- D1 + Workers AI semantic search ------------------- */
   if (head === "semantic-search") {
     const body = await readJson(request);
-    const q = String(body.query ?? url.searchParams.get("q") ?? "");
-    const topK = Number(body.limit ?? url.searchParams.get("limit") ?? 20);
+    const q = String(body.query?? url.searchParams.get("q")?? "");
+    const topK = Number(body.limit?? url.searchParams.get("limit")?? 20);
     if (rest[0] === "reindex") {
       const n = await reindexPois(env as any, Number(body.limit) || 200);
       return json({ indexed: n });
@@ -211,21 +205,49 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
 
   const session = await getSession(request, env);
   const actor = { userId: session.userId, isAdmin: session.isAdmin };
-  const sessionCtx = { user: (session as any).user ?? null };
+  const sessionCtx = { user: (session as any).user?? null };
 
   /* -------------------------- enterprise modules -------------------------- */
 
+  // FIXED: API KEYS ROUTE - was calling missing keysRoute
   if (head === "keys") {
-    return keysRoute(rest, request, env as any, {
-      email: (session as any).user?.email ?? null,
-      name: (session as any).user?.name ?? null,
-    });
+    if (!session.userId) return json({ error: "Unauthorized" }, 401);
+
+    // GET /api/keys
+    if (request.method === "GET" && rest.length === 0) {
+      const result = await env.DB.prepare(
+        `SELECT id, key_hash as key, 0 as requests_count, null as period, created_at, is_active FROM api_keys WHERE user_id =? ORDER BY created_at DESC`
+      ).bind(session.userId).all();
+
+      return json({ keys: result.results || [], quota: 1000 });
+    }
+
+    // POST /api/keys/generate
+    if (request.method === "POST" && rest[0] === "generate") {
+      const rawKey = `poi_${randomToken(24)}`;
+      const keyHash = await hashPassword(rawKey);
+      const now = new Date().toISOString();
+
+      // Deactivate old keys
+      await env.DB.prepare(`UPDATE api_keys SET is_active = 0 WHERE user_id =?`).bind(session.userId).run();
+
+      // Insert new key
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        `INSERT INTO api_keys (id, user_id, name, key_hash, created_at, is_active)
+         VALUES (?,?,?,?,?, 1)`
+      ).bind(id, session.userId, "Default", keyHash, now).run();
+
+      return json({ id, key: rawKey, created_at: now, is_active: 1, requests_count: 0 });
+    }
+
+    return json({ error: "Not found" }, 404);
   }
 
   if (head === "tickets") {
     return ticketsRoute(rest, request, env as any, url, await readJson(request), {
-      ...actor,
-      email: (session as any).user?.email ?? null,
+     ...actor,
+      email: (session as any).user?.email?? null,
     });
   }
 
@@ -235,17 +257,17 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   if (head === "rag") return handleRagRoute(rest, request, env as any, await readJson(request), sessionCtx);
   if (head === "support") {
     const isUpload = rest[0] === "upload";
-    return handleSupportRoute(rest, request, env, isUpload ? {} : await readJson(request), sessionCtx);
+    return handleSupportRoute(rest, request, env, isUpload? {} : await readJson(request), sessionCtx);
   }
   if (head === "events" || head === "analytics") {
-    const segs = head === "events" ? ["events", ...rest] : rest;
+    const segs = head === "events"? ["events",...rest] : rest;
     return handleAnalyticsRoute(segs, request, env, await readJson(request), sessionCtx);
   }
 
   /* -------------------------------- data --------------------------------- */
   if (head === "db") {
     const [table, action] = rest;
-    if (!table || !action) return json({ error: "table and action required" }, 400);
+    if (!table ||!action) return json({ error: "table and action required" }, 400);
     const body = await readJson(request);
     const data = await runTableQuery(env.DB, table, action as any, body, actor);
     return json({ data });
@@ -258,7 +280,7 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
 
   /* --------------------------- places REST API --------------------------- */
   if (head === "places" || head === "place") {
-    const id = head === "place" ? rest[0] : rest[0];
+    const id = head === "place"? rest[0] : rest[0];
     const body = await readJson(request);
 
     if (request.method === "GET" && head === "place" && id) {
@@ -298,10 +320,9 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
     return poiLiveSearch({ query: q, limit: Number(url.searchParams.get("limit")) || 50 }, env);
   }
 
-
   /* ------------------------------- storage -------------------------------- */
   if (head === "storage") {
-    const [bucket, op, ...pathParts] = rest;
+    const [bucket, op,...pathParts] = rest;
     if (!env.BUCKET) return json({ error: "File uploads disabled" }, 501);
 
     if (op === "upload") {
@@ -309,12 +330,12 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
       const form = await request.formData();
       const file = form.get("file") as unknown as File | null;
       const path = String(form.get("path") || "");
-      if (!file || !path) return json({ error: "file and path are required" }, 400);
+      if (!file ||!path) return json({ error: "file and path are required" }, 400);
       const key = `${bucket}/${path}`;
       await env.BUCKET.put(key, await file.arrayBuffer(), {
         httpMetadata: { contentType: (file as any).type || "application/octet-stream" },
       });
-      return json({ path, key, size: (file as any).size ?? null });
+      return json({ path, key, size: (file as any).size?? null });
     }
 
     if (op === "remove") {
@@ -328,13 +349,13 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
       const token = url.searchParams.get("token");
       if (!token) return json({ error: "token required" }, 400);
       const req = await env.DB.prepare(
-        `SELECT * FROM deal_access_requests WHERE download_token = ? AND status = 'approved'`,
+        `SELECT * FROM deal_access_requests WHERE download_token =? AND status = 'approved'`,
       ).bind(token).first<Record<string, any>>();
       if (!req || new Date(req.token_expires_at).getTime() < Date.now()) {
         return json({ error: "This download link is invalid or has expired" }, 403);
       }
-      const doc = await env.DB.prepare(`SELECT * FROM deal_documents WHERE id = ?`)
-        .bind(req.document_id).first<Record<string, any>>();
+      const doc = await env.DB.prepare(`SELECT * FROM deal_documents WHERE id =?`)
+       .bind(req.document_id).first<Record<string, any>>();
       if (!doc) return json({ error: "Document not found" }, 404);
       const object = await env.BUCKET.get(`${bucket}/${doc.file_path}`);
       if (!object) return json({ error: "File not found" }, 404);
