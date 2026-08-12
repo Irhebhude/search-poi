@@ -19,6 +19,7 @@ import { HttpError } from "./_lib/util";
 import { runRpc } from "./_lib/rpc";
 import { reindexPois, semanticSearch } from "./_lib/semantic";
 import { debugRoute, healthRoute, poisRoute, ticketsRoute } from "./_lib/poi";
+import { factSearchRoute, indexDocumentRoute, keysRoute } from "./_lib/searchdb";
 import {
   ayrsharePost, dealRoomApprove, feedbackAi, generateBlueprint, generateBuildGuide,
   generateTrendingContent, imageSearch, json, newsSearch, poiApi, poiLive, poiLiveSearch,
@@ -213,6 +214,13 @@ async function route(head: string, rest: string[], request: Request, env: Env, u
   const sessionCtx = { user: (session as any).user ?? null };
 
   /* -------------------------- enterprise modules -------------------------- */
+
+  if (head === "keys") {
+    return keysRoute(rest, request, env as any, {
+      email: (session as any).user?.email ?? null,
+      name: (session as any).user?.name ?? null,
+    });
+  }
 
   if (head === "tickets") {
     return ticketsRoute(rest, request, env as any, url, await readJson(request), {
