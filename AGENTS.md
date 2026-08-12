@@ -18,6 +18,12 @@
 - `POST /api/revoke-key` `{ api_key }` → sets `is_active=false`.
 - Public key generator UI: `public/generate.html`.
 
+## UI theme (SEARCH-POI ENGINE v1 — cyan dark)
+- Design tokens live in `src/index.css` as HSL CSS variables (consumed by tailwind.config.ts). `.glass` utility = `rgba(20,20,30,0.6)` + `backdrop-blur-md`. Font = Inter (set in tailwind.config `fontFamily.sans` + index.css body).
+- Key colors: bg `#0A0A0F`, fg `#FFFFFF`, primary `#00F0FF` (cyan), accent/hover `#00D4FF`, muted-fg `#A0A0B0`, destructive `#FF3B30`, input `#1A1A24`, green `#00FF88`.
+- Exact icon colors on home quick-action cards are applied via inline `style={{color}}` (not tailwind classes) in `src/pages/Index.tsx` and `src/components/HomeQuickActions.tsx`: POS `#FFD700`, Fuel `#00FF88`, Traffic `#FFA500`, Danger `#FF3B30`.
+- Hero title uses the `.gradient-text` utility (cyan→white). "INTELLIGENT REASONING" badge in AIAnswer is solid `bg-[#00F0FF] text-black`. Confidence value is `text-[#00F0FF]`.
+
 ## Gotchas
 - `functions/api/[[route]].ts` must end with exactly one `export const onSchedule`. An earlier version had a corrupted/duplicated tail (a `onSchedule` line concatenated with `/api/keys/generate` followed by a duplicate route block) — keep it clean.
 - `env.API_KEYS` must be bound in wrangler.toml; create the namespace with `npx wrangler kv namespace create API_KEYS` and replace the placeholder ids.
